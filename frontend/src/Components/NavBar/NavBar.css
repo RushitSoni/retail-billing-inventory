@@ -1,0 +1,151 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 1.5rem;
+  box-shadow: 0 0.3rem 0.4rem rgba(0, 0, 0, 0.1);
+  transition: background 0.3s ease, color 0.3s ease;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  overflow: hidden;
+  z-index: 1000;
+  box-sizing: border-box; /* Extra padding issues fix */
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.menu {
+  display: flex;
+  list-style: none;
+  gap: 1.5rem;
+  padding: 0;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.menu li {
+  transition: color 0.3s ease;
+}
+
+.menu li:hover {
+  color: rgba(176, 173, 173, 0.874);
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dark {
+  background: #222;
+  color: #fff;
+}
+
+.light {
+  background: #ffffff;
+  color: #333;
+}
+
+/* Logo css */
+
+.logo {
+  width: auto;
+  min-width: 200px;
+  max-height: 65px;
+  transition: color 0.3s ease;
+}
+
+.light .logo {
+  filter: invert(0);
+}
+
+.dark .logo {
+  filter: invert(1);
+}
+
+.logo:hover {
+  transform: scale(1.1)  !important;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+/* Buttons Css */
+
+.profile-button, .theme-toggle,.menu-button {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.53rem;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+
+.dark-button {
+  background: #fff;
+  color: #000;
+}
+
+.light-button {
+  background: #000;
+  color: #fff;
+}
+
+
+
+.profile-button:hover, .theme-toggle:hover ,.menu-button:hover {
+  background: rgba(176, 173, 173, 0.874);
+  transform: scale(1.1);
+}
+
+/* Default - Large Screen */
+.menu-button {
+  display: none;  
+}
+
+/* MOBILE RESPONSIVE NAVBAR */
+@media (max-width: 768px) {
+  .menu {
+    display: none;  
+    flex-direction: column;
+    position: absolute;
+    top: 6rem;;
+    left: 0;
+    width: 100%;
+    background: #222;
+    text-align: center;
+    padding: 1rem;
+    transition: all 0.3s ease-in-out;
+    z-index: 9999;
+  }
+
+  .menu.open {
+    display: flex;
+  }
+
+  .menu-button {
+    display: block;  
+  }
+
+  .menu li {
+    padding: 2 rem;
+  }
+  .nav-right {
+    gap: 0.5rem;
+  }
+  .light .menu {
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+  }
+
+  .dark .menu {
+    background: rgba(0, 0, 0, 0.9);
+    color: #fff;
+  }
+}
