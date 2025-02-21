@@ -1,14 +1,27 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useSelector } from 'react-redux';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NavBar from './Components/NavBar/NavBar';
+import Footer from './Components/Footer/Footer';
+import Home from './Components/HomePage/Home';
+import AboutUs from './Components/AboutUs/AboutUs';
+
 
 
 const App = () => {
  
-  const [darkMode, setDarkMode] = useState(false);
+  const darkMode = useSelector((state) => state.theme.darkMode);
 
   return (
     <div className={darkMode ? 'dark' : 'light'}>
-      <NavBar darkMode={darkMode} setDarkMode={setDarkMode} />
+     <Router>
+        <NavBar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/aboutUs" element={<AboutUs/>} />
+        </Routes>
+        <Footer />
+      </Router>
     </div>
   );
 };

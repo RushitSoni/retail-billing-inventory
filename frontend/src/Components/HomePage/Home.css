@@ -1,0 +1,86 @@
+.landing-container {
+    width: 100vw;
+   
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content:flex-start;
+    text-align: center;
+    transition: background 0.3s ease-in-out;
+    background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #ffdde1, #fad0c4);
+    background-size: cover;
+  }
+  
+  .dark-mode {
+    background: #1a1a1a;
+    color: white;
+  }
+  
+  .light-mode {
+    background: #f4f4f4;
+    color: black;
+  }
+  
+  .hero-section {
+    margin-bottom: 40px;
+  }
+  
+  .cta-button {
+    background-color: black;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+    margin-top: 20px;
+  }
+  
+  .cta-button:hover {
+    background-color: gray;
+  }
+  
+  .dark-mode .cta-button {
+    background-color: white;
+    color: black;
+  }
+  
+  .dark-mode .cta-button:hover {
+    background-color: lightgray;
+  }
+  
+  .features-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 3rem;
+  }
+  
+  .feature-block {
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
+  }
+  .dark-mode .feature-block {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  .light-mode .feature-block {
+    background: white;
+  }
+
+  @media (max-width: 768px) {
+
+    .hero-section {
+      margin-bottom: 20px;
+    }
+    .features-section {
+      flex-direction: column;
+      align-items: center;
+    }
+  }

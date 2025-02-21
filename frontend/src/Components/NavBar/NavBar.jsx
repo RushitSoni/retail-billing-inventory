@@ -1,11 +1,18 @@
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Sun, Moon, User, Menu, X } from "lucide-react"; 
 import "./NavBar.css";
 import { motion } from "framer-motion";
 import logo from '../Assests/bizTrack_logo.png';
+import {toggleDarkMode}from '../../Redux/Slices/themeSlice' 
+import { useNavigate } from "react-router-dom";
 
-export default function NavBar({ darkMode, setDarkMode }) {
+export default function NavBar() {
+
+  const darkMode = useSelector((state) => state.theme.darkMode);
+  const dispatch = useDispatch();
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate()
 
   return (
     <header className={`header ${darkMode ? "dark" : "light"}`}>
@@ -17,6 +24,7 @@ export default function NavBar({ darkMode, setDarkMode }) {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.5 }}
+          onClick={() => navigate("/")}
         />
         
         
@@ -25,7 +33,7 @@ export default function NavBar({ darkMode, setDarkMode }) {
           <motion.li whileHover={{ scale: 1.1 }}>Admin</motion.li>
           <motion.li whileHover={{ scale: 1.1 }}>Billing</motion.li>
           <motion.li whileHover={{ scale: 1.1 }}>Inventory</motion.li>
-          <motion.li whileHover={{ scale: 1.1 }}>About Us</motion.li>
+          <motion.li whileHover={{ scale: 1.1 }} onClick={() => navigate("/aboutUs")}>About Us</motion.li>
         </ul>
       </div>
 
@@ -41,7 +49,7 @@ export default function NavBar({ darkMode, setDarkMode }) {
         </motion.button>
         <motion.button
           className={`theme-toggle ${darkMode ? "dark-button" : "light-button"}`}
-          onClick={() => setDarkMode(!darkMode)}
+          onClick={() => dispatch(toggleDarkMode())}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >
