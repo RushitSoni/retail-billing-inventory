@@ -1,0 +1,101 @@
+.signup-container {
+    width: 100vw;
+    min-height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    transition: background 0.3s ease-in-out;
+  }
+  
+  .dark-mode {
+    background: #1a1a1a;
+    color: white;
+  }
+  
+  .light-mode {
+    background: #f4f4f4;
+    color: black;
+  }
+  
+  .hero-section {
+    margin-bottom: 1rem;
+  }
+  
+  .signup-box {
+    padding: 3rem;
+    width: 100%;
+    max-width: 20rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s ease-in-out;
+    margin-bottom: 3rem;
+  }
+  
+  .dark-mode .signup-box {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+  }
+  
+  .light-mode .signup-box {
+    background: white;
+    color: black;
+  }
+  
+  .input-field {
+    width: 100%;
+    margin: 0.5rem 0 !important;
+  }
+  
+  .forgot-link {
+    color: #007bff;
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-align: right;
+    margin: 0.5rem 0 !important;
+  }
+  
+  .signup-btn {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+    margin: 0.5rem 0 !important;
+  }
+  
+  .light-mode .signup-btn {
+    background-color: black;
+    color: white;
+  }
+  
+  .dark-mode .signup-btn {
+    background-color: white;
+    color: black;
+  }
+  
+  .light-mode .signup-btn:hover,
+  .dark-mode .signup-btn:hover {
+    background-color: gray;
+  }
+  
+  .signup-link {
+    margin: 0.5rem 0 !important;
+    font-size: 0.9rem;
+  }
+  
+  .signup-link span {
+    color: #007bff;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .signup-box {
+      padding: 1.5rem;
+    }
+  }
+  

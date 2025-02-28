@@ -1,10 +1,11 @@
 .landing-container {
     width: 100vw;
-   
+    min-height: 70vh;
+    
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content:flex-start;
+    justify-content:center;
     text-align: center;
     transition: background 0.3s ease-in-out;
     background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #ffdde1, #fad0c4);

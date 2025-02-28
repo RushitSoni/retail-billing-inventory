@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^6.4.5",
+    "@mui/material": "^6.4.5",
+    "@mui/styled-engine-sc": "^6.4.3",
     "@reduxjs/toolkit": "^2.5.1",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
@@ -12,8 +17,10 @@
     "ajv-keywords": "^5.1.0",
     "axios": "^1.7.9",
     "bootstrap": "^5.3.3",
+    "dotenv": "^16.4.7",
     "framer-motion": "^12.4.4",
     "frontend": "file:",
+    "jwt-decode": "^4.0.0",
     "lucide-react": "^0.475.0",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.9",
@@ -22,6 +29,7 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^6.29.0",
     "react-scripts": "5.0.1",
+    "styled-components": "^6.1.15",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
