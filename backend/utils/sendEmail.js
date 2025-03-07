@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-const sendEmail = async (to, subject, htmlContent) => {
+const sendEmail = async (to, subject, htmlContent,attachmentPath) => {
   try {
     const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
@@ -18,6 +18,13 @@ const sendEmail = async (to, subject, htmlContent) => {
       to,
       subject,
       html: htmlContent,
+      attachments: [
+        {
+            filename: "invoice.pdf",
+            path: attachmentPath,
+            contentType: "application/pdf",
+        },
+    ],
     });
 
     console.log(`Email sent to: ${to}`);

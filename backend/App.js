@@ -15,9 +15,12 @@ const PORT = process.env.PORT
 // const forgotPasswordRoutes = require("./Route/ForgotPassword")
 // const resetPasswordRoutes = require("./Route/ResetPassword")
 const authRoutes = require("./Route/auth")
+const invoiceEmailRoute = require("./Route/invoice")
 
 const authenticateUser = require("./Middleware/auth")
 const authorizeRoles = require("./Middleware/authorization")
+const customerRoutes = require("./Route/Customer")
+const billRoutes = require("./Route/Bill")
 
 const session = require("express-session");
 const passport = require("passport");
@@ -43,7 +46,9 @@ connectMongoDB()
 // app.use("/api/forgot-password",forgotPasswordRoutes)
 // app.use("/api/reset-password",resetPasswordRoutes)
 app.use("/api/auth",authRoutes)
-
+app.use("/send-invoice-email",invoiceEmailRoute)
+app.use("/api/customers", customerRoutes);
+app.use("/api/bills", billRoutes);
 
 app.get("/aboutUs", authenticateUser, authorizeRoles("admin"), (req, res) => {
     res.send("Hello! Rushit Soni");

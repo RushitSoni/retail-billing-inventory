@@ -1,0 +1,115 @@
+.customer-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 85vh;
+    width: 100vw;
+    padding: 0.5rem;
+    transition: background 0.3s ease-in-out;
+    background: #f4f4f4;
+    color: #333;
+    box-sizing: border-box;
+  }
+  
+  .dark{
+    background: #1a1a1a;
+    color: white;
+  }
+  
+  .light {
+    background: #f4f4f4;
+    color: black;
+  }
+  
+  .customer-card {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 3rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    width: auto;
+    transition: all 0.3s ease-in-out; 
+    margin: 3rem 0;
+  }
+  
+  .dark .customer-card {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .contact-section,.address-section{
+    position: relative;
+    width: 82vw;
+    padding:2rem;
+   
+    border-radius: 8px;
+    margin-top: 1rem;
+  }
+
+  .dark .address-section {
+    background: #1a1a1a !important;
+  }
+  
+  
+  .light .address-section{
+    background: rgba(0, 0, 0, 0.05) !important;
+  }
+
+  .dark .contact-section {
+    background: #1a1a1a !important;
+  }
+  
+  
+  .light .contact-section{
+    background: rgba(0, 0, 0, 0.05) !important;
+  }
+  .customer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 1rem;
+  }
+  
+  .customer-info p {
+    font-size: 1rem;
+    margin: 0;
+    padding: 0.3rem 0;
+  }
+  
+  .customer-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+  }
+  
+  .customer-actions button {
+    padding: 0.7rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .update-btn {
+    background: #007bff;
+    color: white;
+  }
+  
+  .update-btn:hover {
+    background: #0056b3;
+  }
+  
+  .delete-btn {
+    background: red;
+    color: white;
+  }
+  
+  .delete-btn:hover {
+    background: darkred;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .customer-box {
+      width: 90%;
+    }
+  }
+  

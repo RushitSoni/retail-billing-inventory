@@ -11,6 +11,8 @@ import ForgotPassword from './Components/Login_Module/ForgotPassword/ForgotPassw
 import ResetPassword from './Components/Login_Module/ResetPassword/ResetPassword';
 import VerifyEmail from './Components/Login_Module/VerifyEmail/VerifyEmail';
 import GoogleAuthSuccess from './Components/Login_Module/GoogleAuthSuccess/GoogleAuthSuccess';
+import Bill from './Components/Billing_Module/Bill/Bill';
+import CustomerDetails from './Components/Billing_Module/CustomerDetails/CustomerDetails';
 
 
 
@@ -31,6 +33,8 @@ const App = () => {
           <Route path="/reset-password/:token" element={<ResetPassword/>} />
           <Route path="/verify-email/:token" element={<VerifyEmail/>} />
           <Route path='/google-auth-success' element={<GoogleAuthSuccess/>}/>
+          <Route path="/billing" element={<Bill/>}/>
+          <Route path="/customer/:id" element={<CustomerDetails/>}/>
         </Routes>
         <Footer />
       </Router>

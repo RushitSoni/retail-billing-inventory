@@ -41,7 +41,7 @@ export default function NavBar() {
 
         <ul className={`menu ${menuOpen ? "open" : ""}`}>
           <motion.li whileHover={{ scale: 1.1 }}>Admin</motion.li>
-          <motion.li whileHover={{ scale: 1.1 }}>Billing</motion.li>
+          <motion.li whileHover={{ scale: 1.1 }} onClick={() => navigate("/billing")}>Billing</motion.li>
           <motion.li whileHover={{ scale: 1.1 }}>Inventory</motion.li>
           <motion.li whileHover={{ scale: 1.1 }} onClick={() => navigate("/aboutUs")}>About Us</motion.li>
         </ul>

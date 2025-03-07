@@ -1,0 +1,250 @@
+.billing-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 85vh;
+  width:100vw;
+  padding:0.5rem;
+  transition: background 0.3s ease-in-out;
+  background: #f4f4f4;
+  color: #333;
+  box-sizing: border-box; 
+}
+
+.dark{
+  background: #1a1a1a;
+  color: white;
+}
+
+.light {
+  background: #f4f4f4;
+  color: black;
+}
+
+.billing-box {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  width: auto;
+  transition: all 0.3s ease-in-out;
+ 
+}
+
+.dark .billing-box {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+
+.customer-section,.item-section,.total-section {
+  position: relative;
+  width: 82vw;
+  padding:0.5rem;
+ 
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.input-field {
+  
+  margin-bottom: 10px;
+}
+
+/* Suggestions List */
+.suggestions-list {
+  position: absolute;
+  width: 78vw;
+  max-height: 150px;
+  overflow-y: auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  margin-top: 0.5rem;
+  list-style: none;
+  padding: 0.5rem;
+  z-index: 10;
+}
+
+.suggestions-list li {
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.suggestions-list li:hover {
+  background: #ddd;
+}
+
+/* Dark Mode */
+.dark .suggestions-list {
+  background: #333;
+}
+
+.dark .suggestions-list li {
+  color: white;
+}
+
+.dark .suggestions-list li:hover {
+  background: #444;
+}
+
+/* Customer Details */
+.customer-details {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.dark .customer-section{
+  background: #1a1a1a !important;
+}
+
+.dark .item-section {
+  background: #1a1a1a !important;
+}
+
+
+.light .customer-section{
+  background: rgba(0, 0, 0, 0.05) !important;
+}
+
+.light .item-section{
+  background: rgba(0, 0, 0, 0.05) !important;
+}
+
+.dark .total-section {
+  background: #1a1a1a !important;
+}
+
+
+.light .total-section{
+  background: rgba(0, 0, 0, 0.05) !important;
+}
+
+
+.detail-col {
+  flex: 1;
+  padding: 0.5rem;
+}
+
+.detail-col p {
+  margin: 0.5rem 0;
+}
+
+
+/* Item List */
+.item-list {
+  margin-top: 1rem;
+  padding: 0.5rem;
+  
+  border-radius: 8px;
+}
+
+.item-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto; /* Name takes max width, quantity and button take fixed space */
+  align-items: center;
+  gap: 10px;
+  padding: 0.5rem;
+  background: white;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.dark .item-row {
+  background: #222;
+  color: white;
+}
+
+.item-row span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-row input {
+  width: 3rem;
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.item-row button {
+  background: red;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.item-row button:hover {
+  background: darkred;
+}
+
+
+.generate-bill {
+  background:#28a745;
+  color: white;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 8px;
+  height: 3rem;
+  width: 100%;
+  margin-top: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.generate-bill:hover {
+  background: #218838;
+}
+
+.installment-options {
+  margin-top: 1rem;
+}
+
+.grand-total-row {
+  display: grid;
+  grid-template-columns: 7fr 1fr; /* Name takes max width, quantity and button take fixed space */
+  align-items: center;
+  gap: 10px;
+  padding: 0.5rem;
+  background: white;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.dark .grand-total-row {
+  background: #222;
+  color: white;
+}
+
+.grand-total-row span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.grand-total-row input {
+  width: 3rem;
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.action-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.view-details-icon {
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.view-details-icon:hover {
+  color: #007bff;
+}
