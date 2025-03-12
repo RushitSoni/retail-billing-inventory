@@ -1,0 +1,162 @@
+.shop-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 85vh;
+  width: 100vw;
+  padding: 0.5rem;
+  transition: background 0.3s ease-in-out;
+  background: #f4f4f4;
+  color: #333;
+  box-sizing: border-box;
+}
+
+.dark {
+  background: #1a1a1a;
+  color: white;
+}
+
+.light {
+  background: #f4f4f4;
+  color: black;
+}
+
+.shop-card {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 3rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  width: 70vw;
+  max-width: 70vw;
+  transition: all 0.3s ease-in-out;
+  margin: 3rem 0;
+}
+
+.add-shop-btn-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  width:auto;
+  max-width: 75vw;
+  transition: all 0.3s ease-in-out;
+  padding:0
+}
+
+
+
+.dark .shop-card {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+
+.shop-details {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  /* Space between logo and text */
+}
+
+.shop-logo-container {
+  width: 8rem;
+  height: 8rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  /* Elevation effect */
+  padding: 10px;
+}
+
+.light .shop-logo-container {
+  background-color: white;
+}
+
+.dark .shop-logo-container {
+  background-color: black;
+}
+
+.shop-logo {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.shop-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.shop-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.shop-description {
+  font-size: 0.9rem;
+  color: gray;
+  margin: 4px 0 0;
+}
+
+
+.branches-container {
+  margin-top: 2rem;
+}
+
+.branches-list {
+  max-height: 20rem;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+
+.light .branch-item {
+  padding: 0.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.dark .branch-item {
+  padding: 0.5rem;
+  border-bottom: 1px solid gray;
+}
+
+.branch-item:last-child {
+  border-bottom: none;
+}
+
+.details-btn {
+  background: white;
+  border: none;
+  cursor: pointer;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+.dark .details-btn {
+  background: black;
+}
+
+.light .details-btn {
+  background: white;
+}
+
+.dark .details-btn svg {
+  color: white;
+  transition: color 0.3s ease;
+}
+
+.light .details-btn svg {
+  color: black;
+  transition: color 0.3s ease;
+}
+
+.details-btn:hover svg {
+  color: #007bff;
+}

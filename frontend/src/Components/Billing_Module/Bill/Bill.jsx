@@ -1,4 +1,4 @@
-import React, { useState ,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -13,20 +13,52 @@ import {
   InputLabel,
   FormControl,
   Box,
+  Grid,
 } from "@mui/material";
 import "./Bill.css";
 import generateInvoice from "../../../utils/invoiceGenerator";
-import { addCustomer,fetchCustomers } from "../../../Redux/Slices/customerSlice";
+import {
+  addCustomer,
+  fetchCustomers,
+} from "../../../Redux/Slices/customerSlice";
 import { addBill } from "../../../Redux/Slices/billSlice";
-import { Country, State, City }  from 'country-state-city';
+import { Country, State, City } from "country-state-city";
 import { Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { fetchShops } from "../../../Redux/Slices/shopSlice";
+import { fetchInventoryByShopAndBranch } from "../../../Redux/Slices/inventorySlice";
+import { reduceInventoryStock } from "../../../Redux/Slices/inventorySlice";
 
 export default function BillingPage() {
   const darkMode = useSelector((state) => state.theme.darkMode);
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-  
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const shops = useSelector((state) => state.shops.list);
+  const initialProducts = useSelector((state) => state.inventory.list);
+  const [selectedShop, setSelectedShop] = useState("");
+  const [selectedBranch, setSelectedBranch] = useState("");
+  const [products, setProducts] = useState("");
+
+  useEffect(() => {
+    if (selectedShop && selectedBranch) {
+      dispatch(
+        fetchInventoryByShopAndBranch({
+          shopId: selectedShop._id,
+          branchId: selectedBranch._id,
+        })
+      );
+    }
+  }, [selectedShop, selectedBranch, dispatch]);
+  // console.log("Redux State",Array.isArray(initialProducts))
+  useEffect(() => {
+    setProducts(initialProducts);
+  }, [initialProducts]);
+
+  useEffect(() => {
+    dispatch(fetchShops());
+  }, [dispatch]);
+
   const { list } = useSelector((state) => state.customers);
   useEffect(() => {
     dispatch(fetchCustomers());
@@ -38,19 +70,16 @@ export default function BillingPage() {
   const [itemSearch, setItemSearch] = useState("");
   const [filteredItems, setFilteredItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
-  const [installments, setInstallments] = useState(false);
-  const [numInstallments, setNumInstallments] = useState(1);
-  const [installmentPeriod, setInstallmentPeriod] = useState(1);
+  const [installments] = useState(false);
+  const [numInstallments] = useState(1);
+  const [installmentPeriod] = useState(1);
   const [open, setOpen] = useState(false);
 
-  const [countries, ] = useState(Country.getAllCountries());
+  const [countries] = useState(Country.getAllCountries());
   const [states, setStates] = useState([]);
-  const [cities,setCities] = useState([]);
+  const [cities, setCities] = useState([]);
   const [countryCode, setCountryCode] = useState();
-  
 
-
-  
   //Add Customer Modal-popup
   const [customer, setCustomer] = useState({
     name: "",
@@ -68,24 +97,17 @@ export default function BillingPage() {
     setCustomer({ ...customer, [e.target.name]: e.target.value });
   };
   const handleSubmit = () => {
-
     const customerData = {
       ...customer, // Keep all other fields unchanged
-      state: customer.state.name, 
-      country: customer.country.name 
+      state: customer.state.name,
+      country: customer.country.name,
     };
     dispatch(addCustomer(customerData));
     handleClose();
   };
 
   // Dummy customers (Replace this with actual DB fetching logic)
-  const customers = list
-  
-  const items = [
-    { name: "Laptop", price: 50000 },
-    { name: "Mouse", price: 500 },
-    { name: "Keyboard", price: 1500 },
-  ];
+  const customers = list;
 
   const handleSearch = (event) => {
     const query = event.target.value;
@@ -112,7 +134,7 @@ export default function BillingPage() {
     setItemSearch(query);
     setFilteredItems(
       query.length > 0
-        ? items.filter((item) =>
+        ? products.filter((item) =>
             item.name.toLowerCase().includes(query.toLowerCase())
           )
         : []
@@ -120,9 +142,17 @@ export default function BillingPage() {
   };
 
   const addItemToBill = (item) => {
-    setSelectedItems([...selectedItems, { ...item, quantity: 1 }]);
-    setItemSearch("");
-    setFilteredItems([]);
+
+    if(item.stock){
+      setSelectedItems([...selectedItems, { ...item, quantity: 1 }]);
+      setItemSearch("");
+      setFilteredItems([]);
+    }
+    else{
+      alert("Out of Stock !")
+    }
+    
+   
   };
 
   const updateItemQuantity = (index, newQuantity) => {
@@ -135,8 +165,27 @@ export default function BillingPage() {
     setSelectedItems(selectedItems.filter((_, i) => i !== index));
   };
 
+  const CGST = selectedItems.reduce(
+    (cgst, item) => cgst + 0.01 * item.gst * item.price,
+    0
+  );
+  const SGST = selectedItems.reduce(
+    (sgst, item) => sgst + 0.01 * item.gst * item.price,
+    0
+  );
+
+  const discount = selectedItems.reduce(
+    (discount, item) => discount + 0.01 * item.discount * item.price,
+    0
+  );
+
+  const originalTotal = selectedItems.reduce(
+    (ogTotal, item) => ogTotal + item.price * item.quantity,
+    0
+  );
+
   const grandTotal = selectedItems.reduce(
-    (total, item) => total + item.price * item.quantity,
+    (total, item) => total + originalTotal + CGST + SGST - discount,
     0
   );
 
@@ -162,13 +211,16 @@ export default function BillingPage() {
   };
 
   function handleInvoiceGeneration() {
-
-    if (selectedItems.length === 0) {
+    if (!customerDetails) {
+      alert("Please select customer before generating the bill!");
+      return;
+    }
+    if (selectedItems.length === 0 || !customerDetails) {
       alert("Please add items before generating the bill!");
       return;
     }
 
-    const installmentPlannedDates =generateInstallmentPlan()
+    const installmentPlannedDates = generateInstallmentPlan();
 
     const billData = {
       customer: customerDetails?._id || "",
@@ -184,12 +236,20 @@ export default function BillingPage() {
             enabled: true,
             numInstallments: numInstallments || 1,
             installmentPeriod: installmentPeriod || 0,
-            installmentDates: installmentPlannedDates
+            installmentDates: installmentPlannedDates,
           }
         : { enabled: false },
     };
 
     dispatch(addBill(billData));
+    dispatch(
+      reduceInventoryStock({
+        items: selectedItems.map((item) => ({
+          id: item._id,
+          quantity: item.quantity,
+        })),
+      })
+    );
 
     generateInvoice(
       "Gayatri Jewellers",
@@ -199,6 +259,10 @@ export default function BillingPage() {
       grandTotal,
       installmentPlannedDates
     );
+
+    setSelectedItems([]);
+    setCustomerDetails(null);
+    setSearchTerm("");
   }
 
   return (
@@ -210,6 +274,86 @@ export default function BillingPage() {
         transition={{ duration: 1, delay: 0.2 }}
         whileHover={{ scale: 1.005 }}
       >
+        {" "}
+        <div
+          className="customer-section"
+          style={{ marginTop: "1.5rem", marginBottom: "2rem" }}
+        >
+          {/* Shop Dropdown */}
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <FormControl
+                fullWidth
+                variant="filled"
+                sx={{
+                  mb: 2,
+                  "& label": { color: "gray" }, // Default label color
+                  "& label.Mui-focused": { color: "gray" }, // Focused label color
+                  "& .MuiInputBase-input": { color: "gray" }, // Input text color
+                  "& .MuiFilledInput-root": { backgroundColor: "transparent" }, // Remove background
+                  "& .MuiFilledInput-underline:before": {
+                    borderBottomColor: "gray",
+                  }, // Default underline
+                  "& .MuiFilledInput-underline:after": {
+                    borderBottomColor: "gray",
+                  }, // Focused underline
+                }}
+              >
+                <InputLabel>Shop</InputLabel>
+                <Select
+                  value={selectedShop.name}
+                  onChange={(e) => {
+                    setSelectedShop(e.target.value);
+                    setSelectedBranch(""); // Reset branch when shop changes
+                  }}
+                >
+                  {shops.map((shop) => (
+                    <MenuItem key={shop._id} value={shop}>
+                      {shop.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            {/* Branch Dropdown (Based on Selected Shop) */}
+            <Grid item xs={6}>
+              <FormControl
+                fullWidth
+                variant="filled"
+                sx={{
+                  mb: 2,
+                  "& label": { color: "gray" }, // Default label color
+                  "& label.Mui-focused": { color: "gray" }, // Focused label color
+                  "& .MuiInputBase-input": { color: "gray" }, // Input text color
+                  "& .MuiFilledInput-root": { backgroundColor: "transparent" }, // Remove background
+                  "& .MuiFilledInput-underline:before": {
+                    borderBottomColor: "gray",
+                  }, // Default underline
+                  "& .MuiFilledInput-underline:after": {
+                    borderBottomColor: "gray",
+                  }, // Focused underline
+                }}
+              >
+                <InputLabel>Branch</InputLabel>
+                <Select
+                  value={selectedBranch?.name}
+                  onChange={(e) => {
+                    console.log(e.target.value, selectedShop["branches"]);
+                    setSelectedBranch(e.target.value);
+                  }}
+                  disabled={!selectedShop} // Disable if no shop selected
+                >
+                  {selectedShop?.branches?.map((branch) => (
+                    <MenuItem key={branch._id} value={branch}>
+                      {branch.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
+        </div>
         <Box display="flex" justifyContent="flex-end">
           <Button
             variant="contained"
@@ -226,7 +370,6 @@ export default function BillingPage() {
             Add Customer
           </Button>
         </Box>
-
         {/* Add Customer Modal */}
         <Dialog
           open={open}
@@ -395,15 +538,15 @@ export default function BillingPage() {
                 }
                 required
               >
-                 {cities.length > 0 ? (
-                    cities.map((city) => (
-                      <MenuItem key={city.name} value={city.name}>
-                        {city.name}
-                      </MenuItem>
-                    ))
-                  ) : (
-                    <MenuItem disabled>No cities available</MenuItem>
-                  )}
+                {cities.length > 0 ? (
+                  cities.map((city) => (
+                    <MenuItem key={city.name} value={city.name}>
+                      {city.name}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem disabled>No cities available</MenuItem>
+                )}
               </Select>
             </FormControl>
 
@@ -427,23 +570,23 @@ export default function BillingPage() {
               <InputLabel>State</InputLabel>
               <Select
                 value={customer.state}
-                onChange={(e) =>{
-                  setCustomer({ ...customer, state: e.target.value }); 
-                  setCities(City.getCitiesOfState(countryCode, e.target.value.isoCode));
-                }
-                  
-                }
+                onChange={(e) => {
+                  setCustomer({ ...customer, state: e.target.value });
+                  setCities(
+                    City.getCitiesOfState(countryCode, e.target.value.isoCode)
+                  );
+                }}
                 required
               >
                 {states.length > 0 ? (
-                    states.map((state) => (
-                      <MenuItem key={state.isoCode} value={state}>
-                        {state.name}
-                      </MenuItem>
-                    ))
-                  ) : (
-                    <MenuItem disabled>No states available</MenuItem>
-                  )}
+                  states.map((state) => (
+                    <MenuItem key={state.isoCode} value={state}>
+                      {state.name}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem disabled>No states available</MenuItem>
+                )}
               </Select>
             </FormControl>
 
@@ -467,21 +610,19 @@ export default function BillingPage() {
               <InputLabel>Country</InputLabel>
               <Select
                 value={customer.country || ""}
-                onChange={(e) =>
-                  {
-                    setCustomer({ ...customer, country: e.target.value }); 
+                onChange={(e) => {
+                  setCustomer({ ...customer, country: e.target.value });
 
-                    setCountryCode(e.target.value.isoCode);
-                    setStates(State.getStatesOfCountry(e.target.value.isoCode));
-                }
-              }
+                  setCountryCode(e.target.value.isoCode);
+                  setStates(State.getStatesOfCountry(e.target.value.isoCode));
+                }}
                 required
               >
                 {countries.map((country) => (
-                    <MenuItem key={country.isoCode} value={country}>
-                      {country.name}
-                    </MenuItem>
-                 ))}
+                  <MenuItem key={country.isoCode} value={country}>
+                    {country.name}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
 
@@ -555,7 +696,6 @@ export default function BillingPage() {
             </Button>
           </DialogActions>
         </Dialog>
-
         {/* Customer Search Field */}
         <div className="customer-section">
           <TextField
@@ -606,24 +746,22 @@ export default function BillingPage() {
                   <strong>Email:</strong> {customerDetails.email}
                 </p>
                 <p>
-                  <strong>Address:</strong> {customerDetails.address} , 
-                                            {customerDetails.city} , <br />
-                                            {customerDetails.state} , 
-                                            {customerDetails.country} , <br />
-                                            {customerDetails.pincode} .
+                  <strong>Address:</strong> {customerDetails.address} ,
+                  {customerDetails.city} , <br />
+                  {customerDetails.state} ,{customerDetails.country} , <br />
+                  {customerDetails.pincode} .
                 </p>
               </div>
               <div className="detail-col action-col">
-                <Eye 
-                  className="view-details-icon" 
-                  size={24} 
-                  onClick={() => navigate(`/customer/${customerDetails._id}`)} 
+                <Eye
+                  className="view-details-icon"
+                  size={24}
+                  onClick={() => navigate(`/customer/${customerDetails._id}`)}
                 />
               </div>
             </div>
           )}
         </div>
-
         {/* Item Search Section */}
         <div className="item-section">
           <TextField
@@ -659,42 +797,82 @@ export default function BillingPage() {
 
           {/* Added Items List */}
           <div className="item-list">
+            <div className="item-row">
+              <span>Item Name</span>
+              <span>Price</span>
+              <span>Quantity</span>
+              <span>Available</span>
+              <span>CGST</span>
+              <span>SGST</span>
+              <span>Discount</span>
+              <span>Actions</span>
+            </div>
             {selectedItems.length > 0 &&
               selectedItems.map((item, index) => (
                 <div key={index} className="item-row">
-                  <span>
-                    {item.name} - ₹{item.price}{" "}
-                  </span>
+                  <span>{item.name}</span>
+                  <span>₹{item.price}</span>
                   <input
                     type="number"
                     value={item.quantity}
-                    onChange={(e) =>
-                      updateItemQuantity(index, parseInt(e.target.value))
-                    }
-                    min="1"
+                    onChange={(e) => {
+                      let value = parseInt(e.target.value, 10) || 1;
+                      if (value > item.stock) value = item.stock; // Prevent exceeding max stock
+                      // if (value < 1) value = 1; // Prevent going below min value
+                      updateItemQuantity(index, value);
+                    }}
+                    min={1} 
+                    max={item.stock}
+                    disabled={item.stock === 0} // Disables input when stock is 0
                   />
+
+                  <span>{item.stock}</span>
+                  <span>{item.gst}</span>
+                  <span>{item.gst}</span>
+                  <span>{item.discount}</span>
                   <button onClick={() => deleteItem(index)}>Delete</button>
                 </div>
               ))}
           </div>
         </div>
-
         {/* Total section*/}
-
         <div className="total-section">
           <div className="grand-total-row">
-            <h3>Grand Total: ₹{grandTotal}</h3>
-            <label>
+            <h4>
+              <span>Total:</span> <span>₹{originalTotal.toFixed(2)}</span>
+            </h4>
+            <h5>
+              <span>CGST:</span> <span>₹{CGST.toFixed(2)}</span>
+            </h5>
+            <h5>
+              <span>SGST:</span> <span>₹{SGST.toFixed(2)}</span>
+            </h5>
+            <h5>
+              <span>Discount:</span> <span>₹{discount.toFixed(2)}</span>
+            </h5>
+            <hr
+              style={{
+                backgroundColor: "gray",
+                height: "1px",
+                border: "none",
+                width: "100%",
+              }}
+            />
+
+            <h2>
+              <span>Grand Total:</span> <span>₹{grandTotal.toFixed(2)}</span>
+            </h2>
+            {/* <label>
               <input
                 type="checkbox"
                 checked={installments}
                 onChange={(e) => setInstallments(e.target.checked)}
               />{" "}
               Installments
-            </label>
+            </label> */}
           </div>
 
-          {installments && (
+          {/* {installments && (
             <div className="installment-options">
               <TextField
                 label="Number of Installments"
@@ -742,7 +920,7 @@ export default function BillingPage() {
                 }}
               />
             </div>
-          )}
+          )} */}
           <button className="generate-bill" onClick={handleInvoiceGeneration}>
             Generate Bill
           </button>

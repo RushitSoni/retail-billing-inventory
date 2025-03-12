@@ -1,0 +1,98 @@
+.inventory-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 85vh;
+    width: 100vw;
+    padding: 0.5rem;
+    transition: background 0.3s ease-in-out;
+    background: #f4f4f4;
+    color: #333;
+    box-sizing: border-box;
+}
+
+.dark {
+    background: #1a1a1a;
+    color: white;
+}
+
+.light {
+    background: #f4f4f4;
+    color: black;
+}
+
+.inventory-box {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    width: 90vw;
+    transition: all 0.3s ease-in-out;
+    margin:3rem 0
+}
+
+.dark .inventory-box {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+
+.table-section {
+    position: relative;
+    width: auto;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+.dark .table-section {
+    background: #1a1a1a !important;
+  }
+  
+  
+  .light .table-section{
+    background: rgba(0, 0, 0, 0.05) !important;
+  }
+
+
+.input-field {
+
+    margin-bottom: 10px;
+}
+
+/* Suggestions List */
+.suggestions-list {
+    position: absolute;
+    width: 78vw;
+    max-height: 150px;
+    overflow-y: auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    margin-top: 0.5rem;
+    list-style: none;
+    padding: 0.5rem;
+    z-index: 10;
+}
+
+.suggestions-list li {
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.suggestions-list li:hover {
+    background: #ddd;
+}
+
+/* Dark Mode */
+.dark .suggestions-list {
+    background: #333;
+}
+
+.dark .suggestions-list li {
+    color: white;
+}
+
+.dark .suggestions-list li:hover {
+    background: #444;
+}

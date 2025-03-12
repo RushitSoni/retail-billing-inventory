@@ -21,6 +21,8 @@ const authenticateUser = require("./Middleware/auth")
 const authorizeRoles = require("./Middleware/authorization")
 const customerRoutes = require("./Route/Customer")
 const billRoutes = require("./Route/Bill")
+const shopRoutes = require("./Route/Shop");
+const inventoryRoutes = require("./Route/Inventory");
 
 const session = require("express-session");
 const passport = require("passport");
@@ -49,6 +51,8 @@ app.use("/api/auth",authRoutes)
 app.use("/send-invoice-email",invoiceEmailRoute)
 app.use("/api/customers", customerRoutes);
 app.use("/api/bills", billRoutes);
+app.use("/api/shops", shopRoutes);
+app.use("/api/inventory", inventoryRoutes);
 
 app.get("/aboutUs", authenticateUser, authorizeRoles("admin"), (req, res) => {
     res.send("Hello! Rushit Soni");

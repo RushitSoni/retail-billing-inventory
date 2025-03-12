@@ -1,0 +1,79 @@
+.shop-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 85vh;
+    width: 100vw;
+    padding: 0.5rem;
+    transition: background 0.3s ease-in-out;
+    background: #f4f4f4;
+    color: #333;
+    box-sizing: border-box;
+  }
+
+  .dark{
+    background: #1a1a1a;
+    color: white;
+  }
+  
+  .light {
+    background: #f4f4f4;
+    color: black;
+  }
+  
+  .shop-card {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 3rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    width: auto;
+    max-width: 70vw;
+    transition: all 0.3s ease-in-out; 
+    margin: 3rem 0;
+  }
+
+  .dark .shop-card {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+
+
+  
+  .shop-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+  
+  .shop-actions button {
+    padding: 0.7rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s;
+    background-color:#28a745
+  }
+  .shop-actions button:hover
+  {
+    background-color:#218838;
+  }
+
+  .shop-section{
+    position: relative;
+    width: auto;
+    padding:2rem;
+   
+    border-radius: 8px;
+    margin-top: 1rem;
+  }
+
+  .dark .shop-section {
+    background: #1a1a1a !important;
+  }
+  
+  
+  .light .shop-section{
+    background: rgba(0, 0, 0, 0.05) !important;
+  }
+
+ 

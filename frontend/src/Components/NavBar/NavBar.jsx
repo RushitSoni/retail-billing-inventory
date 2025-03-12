@@ -16,7 +16,7 @@ export default function NavBar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const { user } = useSelector((state) => state.auth);
   const navigate = useNavigate()
-  console.log("User from nav. ", user)
+  //console.log("User from nav. ", user)
   const handleLogout = () => {
     dispatch(logoutUser()).then(() => navigate("/login"));
   };
@@ -42,7 +42,8 @@ export default function NavBar() {
         <ul className={`menu ${menuOpen ? "open" : ""}`}>
           <motion.li whileHover={{ scale: 1.1 }}>Admin</motion.li>
           <motion.li whileHover={{ scale: 1.1 }} onClick={() => navigate("/billing")}>Billing</motion.li>
-          <motion.li whileHover={{ scale: 1.1 }}>Inventory</motion.li>
+          <motion.li whileHover={{ scale: 1.1 }} onClick={() => navigate("/inventory")}>Inventory</motion.li>
+          <motion.li whileHover={{ scale: 1.1 }} onClick={() => navigate("/shops")}>My Shop</motion.li>
           <motion.li whileHover={{ scale: 1.1 }} onClick={() => navigate("/aboutUs")}>About Us</motion.li>
         </ul>
       </div>
