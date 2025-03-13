@@ -50,11 +50,25 @@
 }
 
 
+
 .shop-details {
   display: flex;
   align-items: center;
-  gap: 16px;
-  /* Space between logo and text */
+  justify-content: space-between;
+  gap: 16px; /* Space between left and right sections */
+  width: 100%;
+}
+
+.shop-details-left {
+  display: flex;
+  align-items: center;
+  gap: 16px; /* Adjust spacing */
+}
+
+.shop-details-right {
+  display: flex;
+  align-items: center;
+  gap: 16px; /* Adjust spacing */
 }
 
 .shop-logo-container {
@@ -113,9 +127,15 @@
   border-radius: 8px;
 }
 
+.branch-item{
+  display: flex;
+  align-items: center;
+}
+
 .light .branch-item {
   padding: 0.5rem;
   border-bottom: 1px solid #eee;
+ 
 }
 
 .dark .branch-item {
@@ -158,5 +178,5 @@
 }
 
 .details-btn:hover svg {
-  color: #007bff;
+  color: #28a745;
 }

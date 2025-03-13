@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { fetchShops } from "../../../Redux/Slices/shopSlice";
-import { Pencil, Plus } from "lucide-react";
+import { BarChart, Pencil, Plus } from "lucide-react";
 import { Grid, Button } from "@mui/material";
 const ShopDetails = () => {
   const darkMode = useSelector((state) => state.theme.darkMode);
@@ -17,26 +17,27 @@ const ShopDetails = () => {
 
   return (
     <div className={`shop-container ${darkMode ? "dark" : "light"}`}>
-   <Grid container className="add-shop-btn-container">
-    <Grid item>
-      <Button
-        variant="contained"
-        startIcon={<Plus />}
-        onClick={() => navigate("/newShop")}
-        sx={{
-          mt: 5, mb: 0,
-          backgroundColor: "#28a745",
-          color: "white",
-          "&:hover": {
-            backgroundColor: "#218838",
-          },
-        }}
-      >
-        Add Shop
-      </Button>
-    </Grid>
-  </Grid>
-      
+      <Grid container className="add-shop-btn-container">
+        <Grid item>
+          <Button
+            variant="contained"
+            startIcon={<Plus />}
+            onClick={() => navigate("/newShop")}
+            sx={{
+              mt: 5,
+              mb: 0,
+              backgroundColor: "#28a745",
+              color: "white",
+              "&:hover": {
+                backgroundColor: "#218838",
+              },
+            }}
+          >
+            Add Shop
+          </Button>
+        </Grid>
+      </Grid>
+
       {shops.map((shop, shopIndex) => (
         <motion.div
           key={shopIndex}
@@ -48,6 +49,8 @@ const ShopDetails = () => {
         >
           {/* Shop Details */}
           <div className="shop-details">
+
+          <div className="shop-details-left">
             <div className="shop-logo-container">
               <img src={shop.logo} alt="Shop Logo" className="shop-logo" />
             </div>
@@ -55,7 +58,15 @@ const ShopDetails = () => {
               <h1 className="shop-name">{shop.name}</h1>
               <p className="shop-description">{shop.description}</p>
             </div>
+            </div>
 
+            <div className="shop-details-right">
+            <button
+                    className="details-btn"
+                    onClick={() => navigate(`/analytics/${shop._id}`)}
+                  >
+                    <BarChart size={20} />
+                  </button>
             {/* Navigate Button */}
             <button
               className="details-btn"
@@ -63,6 +74,7 @@ const ShopDetails = () => {
             >
               <Pencil size={20} />
             </button>
+            </div>
           </div>
 
           {/* Branches */}
@@ -70,12 +82,20 @@ const ShopDetails = () => {
             <div className="branches-list">
               {shop.branches.map((branch, branchIndex) => (
                 <div key={branchIndex} className="branch-item">
-                  <h3>{branch.name}</h3>
-                  <p>
-                    {branch.address}, {branch.city}, {branch.state} -{" "}
-                    {branch.pincode}
-                  </p>
-                  <p>Managed By {branch.managerId}</p>
+                  <div>
+                    <h3>{branch.name}</h3>
+                    <p>
+                      {branch.address}, {branch.city}, {branch.state} -{" "}
+                      {branch.pincode}
+                    </p>
+                    <p>Managed By {branch.managerId}</p>
+                  </div>
+                  <button
+                    className="details-btn"
+                    onClick={() => navigate(`/shop/${shop._id}/${branch._id}`)}
+                  >
+                    <BarChart size={20} />
+                  </button>
                 </div>
               ))}
             </div>

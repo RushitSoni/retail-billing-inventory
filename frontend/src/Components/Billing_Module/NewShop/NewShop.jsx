@@ -18,7 +18,7 @@ import { addShop } from "../../../Redux/Slices/shopSlice";
 const ShopCreation = () => {
   const darkMode = useSelector((state) => state.theme.darkMode);
   const owner = useSelector((state)=>state.auth.user._id)
-
+  console.log(owner)
   const dispatch = useDispatch();
   const [shop, setShop] = useState({
     owner:"",
@@ -30,6 +30,7 @@ const ShopCreation = () => {
   });
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log(shop)
     dispatch(addShop(shop));
     setShop({
       owner:owner,

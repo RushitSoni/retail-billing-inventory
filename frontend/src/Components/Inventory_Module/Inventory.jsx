@@ -295,7 +295,7 @@ export default function Inventory() {
             }}
           />
           {/* Suggestions List */}
-          {search !== "" && !selectedProduct && (
+          {search && !selectedProduct && filteredProducts.length > 0 && (
             <ul className="suggestions-list">
               {filteredProducts.map((product, index) => (
                 <li key={index} onClick={() => selectProduct(product)}>

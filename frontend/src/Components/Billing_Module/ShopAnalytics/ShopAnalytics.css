@@ -1,0 +1,84 @@
+.main-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 85vh;
+    width:100vw !important;
+    padding:0.5rem;
+    transition: background 0.3s ease-in-out;
+    background: #f4f4f4;
+    color: #333;
+    box-sizing: border-box; 
+}
+
+.dark {
+    background: #1a1a1a;
+    color: white;
+}
+
+.light {
+    background: #f4f4f4;
+    color: black;
+}
+
+.analytics-box {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    width: 90vw;
+    transition: all 0.3s ease-in-out;
+    margin:2rem 0;
+}
+
+.dark .analytics-box {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* NEW: Tabs Wrapper (Prevents Overflow) */
+.tabs-wrapper {
+    width: 100%;
+    overflow-x: auto; /* Enable horizontal scrolling */
+    scrollbar-width: none;
+    padding-bottom: 0.5rem; /* Space for scrollbar */
+}
+
+.tabs {
+    display: flex;
+    gap: 1rem;
+    min-width: max-content; /* Ensures all tabs fit in one line */
+    padding: 1rem;
+}
+
+
+
+/* Individual Tab Buttons */
+.tab-button {
+    flex-shrink: 0; /* Prevent shrinking */
+    min-width: 15rem; /* Ensures buttons don’t become too small */
+    min-height:3rem;
+    padding: 1rem 1.5rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #555;
+    transition: color 0.3s ease-in-out;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+}
+
+/* Light and Dark Mode for Tabs */
+.light .tab-button {
+    background: rgba(0, 0, 0, 0.05) !important;
+}
+.dark .tab-button {
+    background: #1a1a1a !important;
+}
+
+/* Active Tab */
+.tab-button.active {
+    color: #28a745;
+    border-bottom:0.4rem solid  #28a745 ;
+}

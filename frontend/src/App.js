@@ -17,6 +17,8 @@ import NewShop from './Components/Billing_Module/NewShop/NewShop.jsx'
 import Shops from './Components/Billing_Module/Shops/Shops.jsx'
 import ShopDetail from './Components/Billing_Module/ShopDetail/ShopDetail.jsx';
 import Inventory from './Components/Inventory_Module/Inventory.jsx';
+import BranchDetails from './Components/Billing_Module/BranchDetails/BranchDetails.jsx'
+import ShopAnalytics from './Components/Billing_Module/ShopAnalytics/ShopAnalytics.jsx';
 const App = () => {
  
   const darkMode = useSelector((state) => state.theme.darkMode);
@@ -39,7 +41,11 @@ const App = () => {
           <Route path="/newShop" element={<NewShop/>}/>
           <Route path="/shops" element={<Shops/>}/>
           <Route path="/shop/:shopId" element={<ShopDetail />} />
+          <Route path="/analytics/:shopId" element={<ShopAnalytics/>} />
+          <Route path="/shop/:shopId/:branchId" element={<BranchDetails/>} />
           <Route path="/inventory" element={<Inventory />} />
+
+         
 
         </Routes>
         <Footer />

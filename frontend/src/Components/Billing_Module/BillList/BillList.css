@@ -1,0 +1,61 @@
+.bill-section {
+    position: relative;
+    width: auto;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+.dark .bill-section {
+    background: #1a1a1a !important;
+}
+
+
+.light .bill-section {
+    background: rgba(0, 0, 0, 0.05) !important;
+}
+
+
+.input-field {
+
+    margin-bottom: 10px;
+}
+
+/* Suggestions List */
+.suggestions-list {
+    position: absolute;
+    width: 78vw;
+    max-height: 150px;
+    overflow-y: auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    margin-top: 0.5rem;
+    list-style: none;
+    padding: 0.5rem;
+    z-index: 10;
+}
+
+.suggestions-list li {
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.suggestions-list li:hover {
+    background: #ddd;
+}
+
+/* Dark Mode */
+.dark .suggestions-list {
+    background: #333;
+}
+
+.dark .suggestions-list li {
+    color: white;
+}
+
+.dark .suggestions-list li:hover {
+    background: #444;
+}
