@@ -7,7 +7,7 @@ import {
   MenuItem,
   FormControl,
   Select,
-  InputLabel,
+  InputLabel
 } from "@mui/material";
 import { motion } from "framer-motion";
 import { Save } from "lucide-react";
@@ -21,7 +21,7 @@ const ShopCreation = () => {
   console.log(owner)
   const dispatch = useDispatch();
   const [shop, setShop] = useState({
-    owner:"",
+    owner:owner,
     name: "",
     category: "",
     logo: "",
@@ -45,23 +45,49 @@ const ShopCreation = () => {
   const defaultImage =
     "https://th.bing.com/th/id/OIP.NPEIfMNVMZyX4ou00Ull2wAAAA?rs=1&pid=ImgDetMain";
 
-  const handleImageUpload = (e) => {
+  // const handleImageUpload = (e) => {
+  //   const file = e.target.files[0];
+
+  //   if (file) {
+  //     // Validate file type
+  //     if (!file.type.startsWith("image/")) {
+  //       alert("Please upload a valid image file.");
+  //       return;
+  //     }
+
+  //     const reader = new FileReader();
+  //     reader.onloadend = () => {
+  //       setShop({ ...shop, logo: reader.result });
+  //     };
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
+
+  const handleImageUpload = async (e) => {
     const file = e.target.files[0];
+  
+    if (!file) return;
 
-    if (file) {
-      // Validate file type
-      if (!file.type.startsWith("image/")) {
-        alert("Please upload a valid image file.");
-        return;
+    const formData = new FormData();
+    formData.append("image", file);
+  
+    try {
+      const response = await fetch("http://localhost:8000/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+  
+      const data = await response.json();
+      if (data.imageUrl) {
+        setShop({ ...shop, logo: data.imageUrl });
+      } else {
+        alert("Image upload failed");
       }
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setShop({ ...shop, logo: reader.result });
-      };
-      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error("Error uploading image:", error);
     }
   };
+  
 
   const handleChange = (e) => {
     setShop({ ...shop, [e.target.name]: e.target.value });

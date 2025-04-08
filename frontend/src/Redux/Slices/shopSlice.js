@@ -52,6 +52,18 @@ export const deleteShop = createAsyncThunk("shops/delete", async (id, thunkAPI) 
     }
 });
 
+
+// ✅ Fetch Shops for Logged-in User
+export const fetchUserShops = createAsyncThunk("shops/fetchByUser", async (userId, thunkAPI) => {
+    try {
+        const response = await API.get(`/api/shops/user/${userId}`);
+        return response.data;
+    } catch (error) {
+        return thunkAPI.rejectWithValue(error.response?.data?.message || "Failed to fetch user shops");
+    }
+});
+
+
 // ✅ Shop Slice
 const shopSlice = createSlice({
     name: "shops",
@@ -106,6 +118,19 @@ const shopSlice = createSlice({
             // 🗑️ Delete Shop
             .addCase(deleteShop.fulfilled, (state, action) => {
                 state.list = state.list.filter(s => s._id !== action.payload);
+            })
+
+            // 👤 Fetch Shops for Logged-in User
+            .addCase(fetchUserShops.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchUserShops.fulfilled, (state, action) => {
+                state.loading = false;
+                state.list = action.payload;
+            })
+            .addCase(fetchUserShops.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
             });
     },
 });

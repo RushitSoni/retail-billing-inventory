@@ -7,6 +7,8 @@ import BillList from "../BillList/BillList";
 import BranchCharts from "../BranchCharts/BranchCharts";
 import { fetchShopById } from "../../../Redux/Slices/shopSlice";
 import Reports from "../Reports/Reports";
+import Staff from "../Staff/Staff";
+import InventoryTransfer from "../Inventory_Transfer/InventoryTransfer";
 
 const tabs = [
   { id: 0, label: "Bills" },
@@ -20,7 +22,7 @@ export default function TabsComponent() {
   const darkMode = useSelector((state) => state.theme.darkMode);
   const dispatch = useDispatch()
   const shop = useSelector((state)=>state.shops.currentShop)
-  const [selectedTab, setSelectedTab] = useState(3);
+  const [selectedTab, setSelectedTab] = useState(4);
 
   const { shopId, branchId } = useParams();
 
@@ -64,10 +66,10 @@ export default function TabsComponent() {
         {/* Content */}
         <div>
           {selectedTab === 0 && <BillList />}
-          {selectedTab === 1 && <p>Staff</p>}
+          {selectedTab === 1 && <Staff/>}
           {selectedTab === 2 && <BranchCharts shopId={shopId} branchId={branchId}/>}
           {selectedTab === 3 && <Reports shopId={shopId} branchId={branchId} branchName={getBranchName()}/>}
-          {selectedTab === 4 && <p>inventory Transfer</p>}
+          {selectedTab === 4 && <InventoryTransfer></InventoryTransfer>}
         </div>
       </motion.div>
     </div>

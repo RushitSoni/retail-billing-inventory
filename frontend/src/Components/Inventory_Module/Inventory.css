@@ -3,7 +3,7 @@
     justify-content: center;
     align-items: center;
     min-height: 85vh;
-    width: 100vw;
+    width: 100%;
     padding: 0.5rem;
     transition: background 0.3s ease-in-out;
     background: #f4f4f4;
@@ -28,7 +28,7 @@
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     width: 90vw;
     transition: all 0.3s ease-in-out;
-    margin:3rem 0
+   
 }
 
 .dark .inventory-box {
@@ -39,7 +39,7 @@
 .table-section {
     position: relative;
     width: auto;
-    padding: 2rem;
+    padding: 0.5rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
     border-radius: 8px;
     margin-top: 1rem;

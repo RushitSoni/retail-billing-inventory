@@ -26,7 +26,7 @@ import {
   DialogTitle,
 } from "@mui/material";
 import { Edit, XSquare, Plus } from "lucide-react";
-import { fetchShops } from "../../Redux/Slices/shopSlice";
+import { fetchUserShops } from "../../Redux/Slices/shopSlice";
 import {
   addInventory,
   updateInventory,
@@ -34,12 +34,14 @@ import {
   fetchInventoryByShopAndBranch,
 } from "../../Redux/Slices/inventorySlice";
 import "./Inventory.css";
+import Toast from "../Toast/Toast";
 
 export default function Inventory() {
   const darkMode = useSelector((state) => state.theme.darkMode);
   const dispatch = useDispatch();
   const shops = useSelector((state) => state.shops.list);
   const initialProducts = useSelector((state) => state.inventory.list);
+  const user = useSelector((state)=>state.auth.user)
   const [selectedShop, setSelectedShop] = useState("");
   const [selectedBranch, setSelectedBranch] = useState("");
   // useEffect(() => {
@@ -62,8 +64,8 @@ export default function Inventory() {
   }, [initialProducts]);
 
   useEffect(() => {
-    dispatch(fetchShops());
-  }, [dispatch]);
+   dispatch(fetchUserShops(user?._id))
+  }, [dispatch,user]);
 
   // Dummy Product Data
   //const initialProducts = items;
@@ -77,12 +79,21 @@ export default function Inventory() {
   const [openModal, setOpenModal] = useState(false);
   const [edit, setEdit] = useState(0);
   const [editProduct, setEditProduct] = useState(null);
+  const [toast, setToast] = useState({ open: false, message: "", type: "success" });
+
+  const showToast = (msg, type) => {
+    setToast({ open: true, message: msg, type });
+  };
 
   // Sorting logic
   const handleSort = (property) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
+
+  
+      setOrderBy(property);
+  
+   
   };
 
   const sortedProducts = [...products].sort((a, b) => {
@@ -127,7 +138,8 @@ export default function Inventory() {
       name: editProduct.name,
       price: editProduct.price,
       stock: editProduct.stock,
-      gst: editProduct.gst,
+      cgst: editProduct.cgst,
+      sgst: editProduct.sgst,
       discount: editProduct.discount,
       shopId: selectedShop ? selectedShop._id : "",
       branchId: selectedBranch ? selectedBranch._id : "",
@@ -154,9 +166,16 @@ export default function Inventory() {
       setOpenModal(false);
       setEditProduct(null);
       setEdit(0);
+      showToast("Logged in successfully!", "error")
     } catch (error) {
       console.error("Error saving inventory item:", error);
     }
+  };
+
+  const columnNames = {
+    cgst: "CGST(%)",
+    sgst: "SGST(%)",
+    discount: "Discount (%)",
   };
 
   return (
@@ -168,10 +187,10 @@ export default function Inventory() {
         transition={{ duration: 1, delay: 0.2 }}
         whileHover={{ scale: 1.005 }}
       >
-        <Typography variant="h5" sx={{ mt: 5 }}>
+        {/* <Typography variant="h5" sx={{ mt: 5 }}>
           Inventory:
-        </Typography>
-        <div className="table-section" style={{ marginTop: "1.5rem" }}>
+        </Typography> */}
+        <div className="table-section">
           {/* Shop Dropdown */}
           <Grid container spacing={2}>
             <Grid item xs={6}>
@@ -326,17 +345,18 @@ export default function Inventory() {
             <Table>
               <TableHead>
                 <TableRow>
-                  {["name", "price", "stock", "gst", "discount"].map((col) => (
+                  {["name", "price", "stock", "cgst","sgst", "discount"].map((col) => (
                     <TableCell
                       key={col}
-                      sx={{ fontWeight: "bold", fontSize: "1rem" }}
+                      sx={{ fontWeight: "bold", fontSize: "1rem"}}
+                     
                     >
                       <TableSortLabel
                         active={orderBy === col}
                         direction={orderBy === col ? order : "asc"}
                         onClick={() => handleSort(col)}
                       >
-                        {col.charAt(0).toUpperCase() + col.slice(1)}
+                       {columnNames[col] || col.charAt(0).toUpperCase() + col.slice(1)}
                       </TableSortLabel>
                     </TableCell>
                   ))}
@@ -354,7 +374,8 @@ export default function Inventory() {
                       <TableCell>{product.name}</TableCell>
                       <TableCell>{product.price}</TableCell>
                       <TableCell>{product.stock}</TableCell>
-                      <TableCell>{product.gst}</TableCell>
+                      <TableCell>{product.cgst}</TableCell>
+                      <TableCell>{product.sgst}</TableCell>
                       <TableCell>{product.discount}</TableCell>
                       <TableCell>
                         <IconButton
@@ -512,17 +533,45 @@ export default function Inventory() {
           />
           <TextField
             fullWidth
-            label="GST(%)"
+            label="CGST(%)"
             onChange={(e) =>
-              setEditProduct({ ...editProduct, gst: e.target.value })
+              setEditProduct({ ...editProduct, cgst: e.target.value })
             }
             autoFocus
             required
             margin="dense"
-            name="gst"
+            name="cgst"
             type="number"
             variant="filled"
-            value={editProduct?.gst || ""}
+            value={editProduct?.cgst || ""}
+            className="input-field"
+            sx={{
+              mb: 2,
+              "& label": { color: "gray" }, // Default label color
+              "& label.Mui-focused": { color: "gray" }, // Focused label color
+              "& .MuiInputBase-input": { color: "gray" }, // Input text color
+              "& .MuiFilledInput-root": { backgroundColor: "transparent" }, // Remove background
+              "& .MuiFilledInput-underline:before": {
+                borderBottomColor: "gray",
+              }, // Default underline
+              "& .MuiFilledInput-underline:after": {
+                borderBottomColor: "gray",
+              }, // Focused underline
+            }}
+          />
+            <TextField
+            fullWidth
+            label="SGST(%)"
+            onChange={(e) =>
+              setEditProduct({ ...editProduct, sgst: e.target.value })
+            }
+            autoFocus
+            required
+            margin="dense"
+            name="sgst"
+            type="number"
+            variant="filled"
+            value={editProduct?.sgst || ""}
             className="input-field"
             sx={{
               mb: 2,
@@ -591,7 +640,8 @@ export default function Inventory() {
               !editProduct?.name ||
               !editProduct?.price ||
               !editProduct?.stock ||
-              !editProduct?.gst ||
+              !editProduct?.cgst ||
+              !editProduct?.sgst ||
               !editProduct?.discount
             }
             sx={{
@@ -606,6 +656,8 @@ export default function Inventory() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Toast open={toast.open} message={toast.message} type={toast.type} onClose={() => setToast({ ...toast, open: false })} />
     </div>
   );
 }

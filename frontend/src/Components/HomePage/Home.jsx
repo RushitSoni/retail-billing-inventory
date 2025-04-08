@@ -3,12 +3,14 @@ import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { FaReceipt, FaBox, FaChartLine } from "react-icons/fa";
 import "./Home.css";
+import { useNavigate } from "react-router-dom";
 
 
 
 export default function Home() {
     
   const darkMode = useSelector((state) => state.theme.darkMode);
+  const navigate = useNavigate()
 
   return (
     <div className={`landing-container ${darkMode ? "dark-mode" : "light-mode"}`}>
@@ -25,6 +27,7 @@ export default function Home() {
         whileHover={{ scale: 1.1 }} 
         transition={{ duration: 0.3 }}
         className="cta-button"
+        onClick={()=> navigate("/newShop")}
       >
         Get Started
       </motion.button>

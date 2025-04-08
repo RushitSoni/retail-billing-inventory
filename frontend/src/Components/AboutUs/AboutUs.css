@@ -1,0 +1,139 @@
+.about-container {
+    width: 100%;
+    min-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transition: background 0.3s ease-in-out;
+    background-size: cover;
+}
+
+.dark-mode {
+    background: #1a1a1a;
+    color: white;
+}
+
+.light-mode {
+    background: #f4f4f4;
+    color: black;
+}
+
+.about-header {
+    margin-bottom: 2rem;
+}
+
+.about-header h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+}
+
+.about-header p {
+    font-size: 1.2rem;
+    color: #555;
+}
+
+
+
+.about-content {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    margin: 1rem 0;
+    width: 70%;
+}
+
+.about-card {
+    padding: 0.2rem;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3) !important;
+    width: 33%
+}
+
+.about-card h2 {
+    font-size: 1.5rem;
+    padding:0;
+    margin-bottom: 0.5rem;
+}
+
+.about-card p {
+    font-size: 1.1rem;
+    color: #666;
+}
+.dark .about-card {
+    background: rgba(255, 255, 255, 0.1);
+    color:white
+}
+
+
+.light-mode .about-card {
+    background: white;
+    color:black
+}
+
+
+.testimonial-container {
+
+    width: 85%;
+    gap: 1rem;
+    margin: 1.5rem;
+
+}
+
+.testimonial-scroll {
+    display: flex;
+    overflow: auto;
+    gap: 1.5rem;
+    padding: 1rem;
+    scrollbar-width: none;
+
+}
+
+.testimonial-card {
+    min-width: 250px;
+    padding: 1rem;
+    border-radius: 10px !important;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark .testimonial-card {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+
+.light-mode .testimonial-card {
+    background: white;
+}
+
+.testimonial-image {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1rem
+}
+
+.testimonial-position {
+    font-size: 0.9rem;
+    color: #777;
+}
+
+.testimonial-text {
+    font-size: 1rem;
+    font-style: italic;
+    margin-top: 0.3rem;
+}
+@media (max-width: 768px) {
+
+    .about-card{
+        width: 100%;
+    }
+    .about-content{
+        display: flex;
+        flex-direction: column;
+    }
+  }
+

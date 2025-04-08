@@ -7,7 +7,7 @@
   transition: background 0.3s ease, color 0.3s ease;
   /* top: 0;
   left: 0; */
-  width: 100vw;
+  width: 100%;
   /* overflow: hidden; */
   z-index: 1000;
   box-sizing: border-box; 

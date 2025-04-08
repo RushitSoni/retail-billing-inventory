@@ -36,7 +36,7 @@
     "recharts": "^2.15.1",
     "styled-components": "^6.1.15",
     "web-vitals": "^2.1.4",
-    "xlsx": "^0.18.5"
+    "xlsx": "https://cdn.sheetjs.com/xlsx-latest/xlsx-latest.tgz"
   },
   "scripts": {
     "start": "react-scripts start",

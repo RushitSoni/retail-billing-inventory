@@ -17,6 +17,7 @@ export const loginUser = createAsyncThunk("auth/loginUser", async (userData, thu
 export const googleLogin = createAsyncThunk("auth/googleLogin", async (_, thunkAPI) => {
   try {
     const response = await API.get("/api/auth/google/callback", { withCredentials: true });
+    console.log(response.data)
     return response.data;
   } catch (error) {
     return thunkAPI.rejectWithValue(error.response?.data?.message || "Google login failed");
@@ -72,6 +73,7 @@ let user = null;
 if (token) {
     try {
         const decoded = jwtDecode(token); // Decode token to get user info
+        console.log(decoded)
         user = { _id: decoded.id, role: decoded.role ,name:decoded.name}; // Adjust fields as per your JWT payload
     } catch (error) {
         console.error("Invalid token:", error);
@@ -94,6 +96,7 @@ const authSlice = createSlice({
       state.user = null;
     },
     setUser: (state, action) => {
+      console.log(action.payload)
       state.user = action.payload;
     },
   },

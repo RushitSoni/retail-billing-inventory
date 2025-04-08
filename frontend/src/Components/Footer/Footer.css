@@ -4,7 +4,7 @@ p {
   }
 
 footer {
-    width: 100vw;
+    width: 100%;
     padding: 1.5rem 2rem;
     box-shadow: 0 -0.3rem 0.4rem rgba(0, 0, 0, 0.1);
     transition: background 0.3s ease, color 0.3s ease;

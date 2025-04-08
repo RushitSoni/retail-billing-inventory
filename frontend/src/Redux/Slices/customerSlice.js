@@ -50,6 +50,29 @@ export const deleteCustomer = createAsyncThunk("customers/delete", async (id, th
     }
 });
 
+export const fetchCustomerByShop = createAsyncThunk(
+    "customers/fetchByShop",
+    async ({ shopId}, thunkAPI) => {
+        try {
+            const response = await API.get(`/api/customers/shop/${shopId}`);
+            return response.data;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.response?.data?.message || "Failed to fetch inventory by shop and branch");
+        }
+    }
+);
+// ✅ Fetch  by Shop & Branch ID
+export const fetchCustomerByShopAndBranch = createAsyncThunk(
+    "customers/fetchByShopBranch",
+    async ({ shopId, branchId }, thunkAPI) => {
+        try {
+            const response = await API.get(`/api/customers/shop/${shopId}/branch/${branchId}`);
+            return response.data;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.response?.data?.message || "Failed to fetch inventory by shop and branch");
+        }
+    }
+);
 
 // ✅ Customer Slice
 const customerSlice = createSlice({
@@ -90,6 +113,29 @@ const customerSlice = createSlice({
                 state.currentCustomer = action.payload;
             })
             .addCase(fetchCustomerById.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(fetchCustomerByShopAndBranch.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchCustomerByShopAndBranch.fulfilled, (state, action) => {
+                state.loading = false;
+                state.list = action.payload;
+            })
+            .addCase(fetchCustomerByShopAndBranch.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
+            .addCase(fetchCustomerByShop.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchCustomerByShop.fulfilled, (state, action) => {
+                state.loading = false;
+                state.list = action.payload;
+            })
+            .addCase(fetchCustomerByShop.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })

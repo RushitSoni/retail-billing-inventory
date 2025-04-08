@@ -63,6 +63,18 @@ export const fetchInventoryByShopAndBranch = createAsyncThunk(
         }
     }
 );
+
+export const fetchInventoryByShop = createAsyncThunk(
+    "inventory/fetchByShop",
+    async ({ shopId}, thunkAPI) => {
+        try {
+            const response = await API.get(`/api/inventory/shop/${shopId}`);
+            return response.data;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.response?.data?.message || "Failed to fetch inventory by shop and branch");
+        }
+    }
+);
 export const reduceInventoryStock = createAsyncThunk(
     "inventory/reduceStock",
     async ({ items }, thunkAPI) => {
@@ -74,6 +86,7 @@ export const reduceInventoryStock = createAsyncThunk(
         }
     }
 );
+
 
 
 
@@ -122,6 +135,19 @@ const inventorySlice = createSlice({
                 state.error = action.payload;
             })
 
+            // 🔄 Fetch Inventory by Shop  ID
+            .addCase(fetchInventoryByShop.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchInventoryByShop.fulfilled, (state, action) => {
+                state.loading = false;
+                state.list = action.payload;
+            })
+            .addCase(fetchInventoryByShop.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
             // 🔍 Get Inventory Item by ID
             .addCase(fetchInventoryById.pending, (state) => {
                 state.loading = true;
@@ -160,3 +186,4 @@ const inventorySlice = createSlice({
 });
 
 export default inventorySlice.reducer;
+// export const selectInventoryList = (state) => state.inventory?.list;

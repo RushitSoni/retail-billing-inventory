@@ -17,7 +17,7 @@ const BranchSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    country: { // Fixed typo from "contry" to "country"
+    country: { 
         type: String,
         required: true
     },
@@ -59,6 +59,8 @@ const ShopSchema = new mongoose.Schema({
         type: String
     },
     branches: [BranchSchema], // Array of branches
+}, {
+    timestamps: true
 });
 
 module.exports = mongoose.model("Shop", ShopSchema);

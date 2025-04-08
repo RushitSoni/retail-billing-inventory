@@ -23,6 +23,10 @@ const customerRoutes = require("./Route/Customer")
 const billRoutes = require("./Route/Bill")
 const shopRoutes = require("./Route/Shop");
 const inventoryRoutes = require("./Route/Inventory");
+const userRoutes = require("./Route/usres")
+const inventoryRequestRoutes = require("./Route/InventoryRequest")
+const uploadRoutes = require("./Route/upload");
+const auditLogRoutes = require("./Route/AuditLog")
 
 const session = require("express-session");
 const passport = require("passport");
@@ -49,15 +53,17 @@ connectMongoDB()
 // app.use("/api/reset-password",resetPasswordRoutes)
 app.use("/api/auth",authRoutes)
 app.use("/send-invoice-email",invoiceEmailRoute)
-app.use("/api/customers", customerRoutes);
-app.use("/api/bills", billRoutes);
-app.use("/api/shops", shopRoutes);
-app.use("/api/inventory", inventoryRoutes);
-
-app.get("/aboutUs", authenticateUser, authorizeRoles("admin"), (req, res) => {
-    res.send("Hello! Rushit Soni");
-});
-
+app.use("/api/customers",authenticateUser, customerRoutes);
+app.use("/api/bills",authenticateUser, billRoutes);
+app.use("/api/shops",authenticateUser, shopRoutes);
+app.use("/api/inventory",authenticateUser, inventoryRoutes);
+app.use("/api/users",authenticateUser, userRoutes);
+app.use("/api/inventory-requests",authenticateUser,inventoryRequestRoutes)
+// app.get("/aboutUs", authenticateUser, authorizeRoles("admin"), (req, res) => {
+//     res.send("Hello! Rushit Soni");
+// });
+app.use("/api/upload", uploadRoutes);
+app.use("/api/audit-logs",authenticateUser,authorizeRoles("admin"),auditLogRoutes)
 
 
 

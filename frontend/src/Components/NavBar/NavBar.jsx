@@ -40,7 +40,7 @@ export default function NavBar() {
         
 
         <ul className={`menu ${menuOpen ? "open" : ""}`}>
-          <motion.li whileHover={{ scale: 1.1 }}>Admin</motion.li>
+          <motion.li whileHover={{ scale: 1.1 }} onClick={() => navigate("/admin")}>Admin</motion.li>
           <motion.li whileHover={{ scale: 1.1 }} onClick={() => navigate("/billing")}>Billing</motion.li>
           <motion.li whileHover={{ scale: 1.1 }} onClick={() => navigate("/inventory")}>Inventory</motion.li>
           <motion.li whileHover={{ scale: 1.1 }} onClick={() => navigate("/shops")}>My Shop</motion.li>
@@ -75,7 +75,7 @@ export default function NavBar() {
            <ul className="profile-dropdown">
            {user ? (
              <>
-               <li>
+               <li onClick={()=> navigate(`/user-profile/${user._id}`)}>
                  <User size={16} /> Profile
                </li>
                <li onClick={handleLogout}>

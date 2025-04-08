@@ -21,6 +21,13 @@ passport.use(
                         // ❌ User exists but trying to sign up → Throw error
                         return done(null, false);
                     }
+
+                    if(!user.googleId){
+                      
+                        return done(null, false);
+                    }
+
+
                     // ✅ User exists & trying to log in → Allow login
                     return done(null, user);
                 }

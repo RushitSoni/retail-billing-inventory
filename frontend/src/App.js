@@ -19,6 +19,11 @@ import ShopDetail from './Components/Billing_Module/ShopDetail/ShopDetail.jsx';
 import Inventory from './Components/Inventory_Module/Inventory.jsx';
 import BranchDetails from './Components/Billing_Module/BranchDetails/BranchDetails.jsx'
 import ShopAnalytics from './Components/Billing_Module/ShopAnalytics/ShopAnalytics.jsx';
+import Admin from './Components/Admin/Admin.jsx'
+import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute.jsx'
+import Unauthorized from './Components/Unauthorized/Unauthorized.jsx';
+import Profile from './Components/Profile/Profile.jsx';
+
 const App = () => {
  
   const darkMode = useSelector((state) => state.theme.darkMode);
@@ -29,21 +34,74 @@ const App = () => {
         <NavBar />
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/admin" element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <Admin/>
+              </ProtectedRoute>
+          } 
+          />
           <Route path="/aboutUs" element={<AboutUs/>} />
+          <Route path="/unauthorized" element={<Unauthorized/>}/>
+
+
           <Route path="/login" element={<Login/>} />
           <Route path='/signup' element={<SignUp/>}/>
           <Route path="/forgotpassword" element={<ForgotPassword/>} />
           <Route path="/reset-password/:token" element={<ResetPassword/>} />
           <Route path="/verify-email/:token" element={<VerifyEmail/>} />
           <Route path='/google-auth-success' element={<GoogleAuthSuccess/>}/>
-          <Route path="/billing" element={<Bill/>}/>
-          <Route path="/customer/:id" element={<CustomerDetails/>}/>
-          <Route path="/newShop" element={<NewShop/>}/>
-          <Route path="/shops" element={<Shops/>}/>
-          <Route path="/shop/:shopId" element={<ShopDetail />} />
-          <Route path="/analytics/:shopId" element={<ShopAnalytics/>} />
-          <Route path="/shop/:shopId/:branchId" element={<BranchDetails/>} />
-          <Route path="/inventory" element={<Inventory />} />
+
+
+          <Route path="/billing" element={
+            <ProtectedRoute allowedRoles={["admin", "user"]}>
+              <Bill/>
+            </ProtectedRoute>
+            }
+          />
+          <Route path="/customer/:id" element={
+            <ProtectedRoute allowedRoles={["admin", "user"]}>
+              <CustomerDetails/>
+            </ProtectedRoute>
+            }
+          />
+          <Route path="/newShop"element={
+            <ProtectedRoute allowedRoles={["admin", "user"]}>
+              <NewShop/>
+            </ProtectedRoute>
+            }
+          />
+          <Route path="/shops" element={
+            <ProtectedRoute allowedRoles={["admin", "user"]}>
+              <Shops/>
+            </ProtectedRoute>
+            }/>
+          <Route path="/shop/:shopId" element={
+            <ProtectedRoute allowedRoles={["admin", "user"]}>
+              <ShopDetail/>
+            </ProtectedRoute>
+            } />
+          <Route path="/analytics/:shopId" element={
+            <ProtectedRoute allowedRoles={["admin", "user"]}>
+              <ShopAnalytics/>
+            </ProtectedRoute>
+            }/>
+          <Route path="/shop/:shopId/:branchId" element={
+            <ProtectedRoute allowedRoles={["admin", "user"]}>
+              <BranchDetails/>
+            </ProtectedRoute>
+            } />
+          <Route path="/inventory" element={
+            <ProtectedRoute allowedRoles={["admin", "user"]}>
+              <Inventory/>
+            </ProtectedRoute>
+            } />
+
+
+          <Route path="/user-profile/:userId" element={
+            <ProtectedRoute allowedRoles={["admin", "user"]}>
+              <Profile/>
+            </ProtectedRoute>
+            } />
 
          
 

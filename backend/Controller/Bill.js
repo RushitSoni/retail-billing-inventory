@@ -2,11 +2,14 @@ const Bill = require("../Model/Bill");
 
 exports.createBill = async (req, res) => {
   try {
-    const { customer, items, grandTotal, installments } = req.body;
+    const { customer,biller,shopId,branchId, items, grandTotal, installments } = req.body;
     
     // Create new bill
     const bill = new Bill({
       customer,
+      biller,
+      shopId,
+      branchId,
       items,
       grandTotal,
       installments
@@ -22,7 +25,10 @@ exports.createBill = async (req, res) => {
 
 exports.getBills = async (req, res) => {
   try {
-    const bills = await Bill.find().populate("customer");
+    const bills = await Bill.find().populate("customer")
+    .populate("biller")
+    .populate("shopId") ;
+
     res.json({ success: true, bills });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error" });
@@ -31,7 +37,10 @@ exports.getBills = async (req, res) => {
 
 exports.getBillById = async (req, res) => {
   try {
-    const bill = await Bill.findById(req.params.id).populate("customer");
+    const bill = await Bill.findById(req.params.id)
+    .populate("customer")
+    .populate("biller")
+    .populate("shopId");
     if (!bill) return res.status(404).json({ success: false, message: "Bill not found" });
 
     res.json({ success: true, bill });
@@ -49,3 +58,30 @@ exports.deleteBill = async (req, res) => {
   }
 };
 
+exports.getBillsByShopAndBranch = async (req, res) => {
+  try {
+    const { shopId, branchId } = req.params;
+    const bills = await Bill.find({ shopId, branchId })
+      .populate("customer")
+      .populate("biller")
+      .populate("shopId");
+
+    res.json({ success: true, bills });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+exports.getBillsByShop = async (req, res) => {
+  try {
+    const { shopId} = req.params;
+    const bills = await Bill.find({ shopId })
+      .populate("customer")
+      .populate("biller")
+      .populate("shopId");
+
+    res.json({ success: true, bills });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};

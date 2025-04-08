@@ -3,15 +3,18 @@ import { TextField, Button, Typography, Paper } from "@mui/material";
 import { motion } from "framer-motion";
 import "./ResetPassword.css";
 import { useSelector,useDispatch } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {resetPassword} from "../../../Redux/Slices/authSlice"
+import { jwtDecode } from "jwt-decode";
 
 export default function ResetPassword() {
   const darkMode = useSelector((state) => state.theme.darkMode);
   const [newPassword, setNewPassword] = useState("");
   const { token } = useParams();
-    
+  const decoded = jwtDecode(token); // ✅ Decode JWT Token
+  console.log(decoded)
     const dispatch = useDispatch();
+    const navigate = useNavigate()
     const { message, error } = useSelector((state) => state.auth);
 
     const handleReset = (e) => {
@@ -19,6 +22,7 @@ export default function ResetPassword() {
       dispatch(resetPassword({ token, newPassword }));
     };
 
+   
    
 
   return (
@@ -57,7 +61,7 @@ export default function ResetPassword() {
                 required
                 disabled
                 className="reset-input-field"
-                value="John Doe"
+                value={decoded.name}
                 sx={{
                   "& label": { color: "gray" },
                   "& label.Mui-focused": { color: "gray" },
@@ -84,7 +88,7 @@ export default function ResetPassword() {
                 required
                 disabled
                 className="reset-input-field"
-                value="xyz@gmail.com"
+                value={decoded.email}
                 sx={{
                   "& label": { color: "gray" }, // Default label color
                   "& label.Mui-focused": { color: "gray" }, // Focused label color
@@ -128,7 +132,7 @@ export default function ResetPassword() {
                 Reset Password
               </Button>
               <Typography className="reset-login-link">
-                Remembered your password? <span>Login</span>
+                Remembered your password? <span onClick={()=>{navigate("/login")}}>Login</span>
               </Typography>
             </motion.div>
           </form>

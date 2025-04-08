@@ -77,3 +77,32 @@ exports.deleteCustomer = async (req, res) => {
         res.status(500).json({ success: false, message: "Error deleting customer" });
     }
 };
+
+exports.getCustomersByShopAndBranch = async (req, res) => {
+    try {
+      const { shopId, branchId } = req.params;
+      const filter = {};
+  
+      if (shopId) filter.shopId = shopId;
+      if (branchId) filter.branchId = branchId;
+  
+      const customers = await Customer.find(filter);
+      res.status(200).json(customers);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch customers by shop and branch", error: error.message });
+    }
+  };
+  
+  exports.getCustomersByShop = async (req, res) => {
+    try {
+      const { shopId } = req.params;
+      const filter = {};
+  
+      if (shopId) filter.shopId = shopId;
+  
+      const customers = await Customer.find(filter);
+      res.status(200).json(customers);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch customers by shop", error: error.message });
+    }
+  };

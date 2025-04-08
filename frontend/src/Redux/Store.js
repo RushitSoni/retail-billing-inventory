@@ -6,6 +6,9 @@ import customerReducer from './Slices/customerSlice'
 import billReducer from './Slices/billSlice'
 import shopReducer from './Slices/shopSlice'
 import inventoryReducer from './Slices/inventorySlice'
+import userReducer from './Slices/userSlice'
+import inventoryRequestReducer from './Slices/inventoryRequestSlice'
+import auditLogReducer from './Slices/auditLogSlice'
 
 const store = configureStore({
     reducer:{
@@ -16,6 +19,9 @@ const store = configureStore({
         bills: billReducer,
         shops: shopReducer,
         inventory: inventoryReducer,
+        users:userReducer,
+        inventoryRequests : inventoryRequestReducer,
+        auditLogs : auditLogReducer
     }
 })
 

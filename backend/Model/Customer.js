@@ -8,12 +8,12 @@ const customerSchema = new mongoose.Schema({
     phone: {
         type: String,
         required: true,
-        
+
     },
     email: {
         type: String,
         required: true,
-       
+
     },
     address: {
         type: String,
@@ -33,6 +33,21 @@ const customerSchema = new mongoose.Schema({
     },
     pincode: {
         type: String,
+        required: true
+    },
+    biller: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
+
+    shopId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Shop",
+        required: true
+    },
+    branchId: {
+        type: mongoose.Schema.Types.ObjectId,
         required: true
     },
 }, {

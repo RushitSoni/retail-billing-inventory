@@ -12,10 +12,16 @@ import {
 import { PieChart, Pie, Cell } from "recharts";
 import { BarChart, Bar } from "recharts";
 import { ResponsiveContainer } from "recharts";
-import { fetchBills } from "../../../Redux/Slices/billSlice";
-import { fetchInventory, fetchInventoryByShopAndBranch } from "../../../Redux/Slices/inventorySlice";
+import {
+  fetchBillsByShop,
+  fetchBillsByShopAndBranch,
+} from "../../../Redux/Slices/billSlice";
+import {
+  fetchInventoryByShop,
+  fetchInventoryByShopAndBranch,
+} from "../../../Redux/Slices/inventorySlice";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCustomers } from "../../../Redux/Slices/customerSlice";
+import { fetchCustomerByShop,fetchCustomerByShopAndBranch } from "../../../Redux/Slices/customerSlice";
 
 const COLORS = [
   "#4CAF50",
@@ -29,64 +35,80 @@ const COLORS = [
   "#F44336",
 ];
 
-const shopBranchData = [
-  { shop: "Shop 1", branch1: 400, branch2: 300 },
-  { shop: "Shop 2", branch1: 500, branch2: 200 },
-];
-
-
-
 const BranchCharts = (props) => {
   const dispatch = useDispatch();
   const bills = useSelector((state) => state.bills.list); // Assuming bills are stored in Redux state
   const [salesData, setSalesData] = useState([]);
   const [productData, setProductData] = useState([]);
-  const [topCustomersData,setTopCustomersData] = useState([])
+  const [topCustomersData, setTopCustomersData] = useState([]);
+  const [shopBranchData, setShopBranchData] = useState([]);
 
   const inventory = useSelector((state) => state.inventory.list);
   const [stockData, setStockData] = useState([]);
 
-  const customers = useSelector((state)=>state.customers.list)
+  const customers = useSelector((state) => state.customers.list);
   const [customerData, setCustomerData] = useState([]);
 
   useEffect(() => {
-    dispatch(fetchCustomers())
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (customers.length > 0 || bills.length>0) {
-      setCustomerData(transformCustomerData(customers,bills))
+    if (props.shopId && props.branchId) {
+      if (props.branchId === "all") {
+        dispatch(fetchCustomerByShop({
+          shopId: props.shopId
+        }));
+      } else {
+        dispatch(
+          fetchCustomerByShopAndBranch({
+            shopId: props.shopId,
+            branchId: props.branchId,
+          })
+        );
+      }
     }
-  }, [customers,bills]);
+  }, [props.shopId, props.branchId,dispatch]);
 
   useEffect(() => {
-    dispatch(fetchBills());
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (bills.length > 0) {
-      setSalesData(transformSalesData(bills));
-      setProductData(transformProductData(bills));
-      setTopCustomersData(transformTopCustomers(bills))
-    }
-  }, [bills]);
-  
+   
+      setCustomerData(transformCustomerData(customers, bills));
+    
+  }, [customers, bills]);
 
   useEffect(() => {
     if (props.shopId && props.branchId) {
-
-     if(props.branchId === 'all'){
-        dispatch(fetchInventory())
-     }
-     else{
+      if (props.branchId === "all") {
+        dispatch(fetchBillsByShop({ shopId: props.shopId }));
+      } else {
         dispatch(
-            fetchInventoryByShopAndBranch({
-              shopId: props.shopId,
-              branchId: props.branchId,
-            })
-          );
-     }
-     
+          fetchBillsByShopAndBranch({
+            shopId: props.shopId,
+            branchId: props.branchId,
+          })
+        );
+      }
+    }
+  }, [props.shopId, props.branchId, dispatch]);
+
+  useEffect(() => {
+    console.log(bills);
+    setSalesData(transformSalesData(bills));
+    setProductData(transformProductData(bills));
+    setTopCustomersData(transformTopCustomers(bills));
+    setShopBranchData(transformShopBranchData(bills));
+  }, [bills]);
+
+  useEffect(() => {
+    if (props.shopId && props.branchId) {
+      if (props.branchId === "all") {
+        dispatch(fetchInventoryByShop({
+          shopId: props.shopId
+        }));
+      } else {
+        dispatch(
+          fetchInventoryByShopAndBranch({
+            shopId: props.shopId,
+            branchId: props.branchId,
+          })
+        );
+      }
     }
   }, [props.shopId, props.branchId, dispatch]);
   // console.log("Redux State",Array.isArray(initialProducts))
@@ -139,22 +161,20 @@ const BranchCharts = (props) => {
       value: productMap[name],
     }));
   };
-  const transformCustomerData = (customers,bills) => {
+  const transformCustomerData = (customers, bills) => {
     const customerMap = {};
 
     bills.forEach((bill) => {
-        const month = new Date(bill.createdAt).toLocaleString("en-US", {
-          month: "short",
-        });
-  
-        if (!customerMap[month]) {
-            customerMap[month] = { month, newCustomers: 0, totalBills:0  };
-          }
-  
-        customerMap[month].totalBills += 1;
+      const month = new Date(bill.createdAt).toLocaleString("en-US", {
+        month: "short",
       });
-  
-     
+
+      if (!customerMap[month]) {
+        customerMap[month] = { month, newCustomers: 0, totalBills: 0 };
+      }
+
+      customerMap[month].totalBills += 1;
+    });
 
     customers.forEach((customer) => {
       const month = new Date(customer.createdAt).toLocaleString("en-US", {
@@ -168,58 +188,100 @@ const BranchCharts = (props) => {
       customerMap[month].newCustomers += 1; // Assuming all fetched customers are new for now
     });
 
-    console.log(customerMap)
+    console.log(customerMap);
 
     Object.keys(customerMap).forEach((month) => {
-        customerMap[month].returningCustomers = Math.max(
-          customerMap[month].totalBills - customerMap[month].newCustomers,
-          0
-        );
-      });
-    
-      
-    return Object.values(customerMap);
-    
-  };
+      customerMap[month].returningCustomers = Math.max(
+        customerMap[month].totalBills - customerMap[month].newCustomers,
+        0
+      );
+    });
 
+    
+
+    return Object.values(customerMap);
+  };
 
   const transformTopCustomers = (bills) => {
     const customerMap = {};
-  
+
     bills.forEach((bill) => {
       const customerId = bill.customer._id;
-  
+
       if (!customerMap[customerId]) {
-        customerMap[customerId] = { customer: bill.customer.name, purchases: 0 };
+        customerMap[customerId] = {
+          customer: bill.customer.name,
+          purchases: 0,
+        };
       }
-  
+
       customerMap[customerId].purchases += bill.grandTotal;
     });
-  
 
-    console.log(customerMap)
+    console.log(customerMap);
     // Convert to array, sort by purchases (desc), and get top 5
     return Object.values(customerMap)
       .sort((a, b) => b.purchases - a.purchases)
       .slice(0, 5);
   };
-  
+
+  const transformShopBranchData = (bills) => {
+    const shopBranchMap = {};
+    const branchSet = new Set();
+
+    bills.forEach((bill) => {
+      const { shopId, branchId } = bill;
+      console.log(bill);
+
+      const branch = shopId?.branches?.find((b) => b._id === branchId);
+      const branchName = branch ? branch.name : `Branch ${branchId}`;
+
+      const shopKey = `${shopId?.name}_${shopId?._id}`;
+      const branchKey = `${branchName}`;
+
+      branchSet.add(branchKey);
+
+      if (!shopBranchMap[shopKey]) {
+        shopBranchMap[shopKey] = { shop: shopId?.name };
+      }
+
+      if (!shopBranchMap[shopKey][branchKey]) {
+        shopBranchMap[shopKey][branchKey] = 0;
+      }
+
+      shopBranchMap[shopKey][branchKey] += bill.grandTotal;
+    });
+
+    console.log({
+      data: Object.values(shopBranchMap),
+      branches: Array.from(branchSet),
+    });
+
+    return {
+      data: Object.values(shopBranchMap),
+      branches: Array.from(branchSet),
+    };
+  };
 
   return (
     <div className="dashboard-grid">
       {/* Sales  Analysis (Line Chart) */}
       <div className="chart-container">
         <h2>Sales Analysis</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={salesData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line type="monotone" dataKey="sales" stroke="#28a745" />
-          </LineChart>
-        </ResponsiveContainer>
+        {salesData.length>0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={salesData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="sales" stroke="#28a745" />
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <div style={{margin:"5rem"}}>No Data Available.</div>
+        )}
       </div>
 
       {/* Product Performance (Pie Chart) */}
@@ -264,20 +326,34 @@ const BranchCharts = (props) => {
       </div>
 
       {/* Shop & Branch Performance (Grouped Bar Chart) */}
-      <div className="chart-container">
-        <h2>Shop & Branch Performance</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={shopBranchData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="shop" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="branch1" fill="#0088FE" />
-            <Bar dataKey="branch2" fill="#00C49F" />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+      {props.branchId === "all" ? (
+        <div className="chart-container">
+          <h2>Branch Wise Sales Data</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={shopBranchData?.data}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="shop" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              {shopBranchData?.branches?.map((branch, index) => (
+                <Bar
+                  key={branch}
+                  dataKey={branch}
+                  fill={
+                    ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#A28DFF"][
+                      index % 5
+                    ]
+                  }
+                  name={branch}
+                />
+              ))}
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      ) : (
+        <div></div>
+      )}
 
       {/* Customer Growth & Engagement (Stacked Bar Chart) */}
       <div className="chart-container">
@@ -302,7 +378,15 @@ const BranchCharts = (props) => {
           <BarChart layout="vertical" data={topCustomersData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis type="number" />
-            <YAxis dataKey="customer" type="category" />
+            <YAxis
+              dataKey="customer"
+              type="category"
+              tick={{ angle: 0 }}
+              width={100}
+              tickFormatter={(value) =>
+                value.length > 15 ? `${value.substring(0, 15)}...` : value
+              }
+            />
             <Tooltip />
             <Legend />
             <Bar dataKey="purchases" fill="#FFBB28" />

@@ -6,7 +6,7 @@ import {
   updateShop,
   deleteShop,
 } from "../../../Redux/Slices/shopSlice";
-import { Country, State, City } from "country-state-city";
+import { State, City } from "country-state-city";
 import { motion } from "framer-motion";
 import {
   TextField,
@@ -22,14 +22,22 @@ import {
   DialogTitle,
   DialogActions,
 } from "@mui/material";
-import { Trash2, Save, X, Plus } from "lucide-react";
+import { Trash2, X, Plus, Pencil } from "lucide-react";
 import "./ShopDetail.css";
+import { fetchAllUsers } from "../../../Redux/Slices/userSlice";
 
 const ShopDetail = () => {
   const { shopId } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { currentShop } = useSelector((state) => state.shops);
+  console.log(currentShop);
+  const [userDetails, setUserDetails] = useState({});
+  const [searchTerm, setSearchTerm] = useState({}); // Object to store searchTerm per branch
+
+  //console.log(userDetails)
+  const [userDetailsDialog, setUserDetailsDialog] = useState(null);
+  const [searchTermDialog, setSearchTermDialog] = useState(""); // Object to store searchTerm per branch
   const [shop, setShop] = useState({
     name: "",
     description: "",
@@ -45,16 +53,24 @@ const ShopDetail = () => {
     state: null,
     city: "",
     pincode: "",
-    managerId:'65ef5678abcd9012ef345678'
+    managerId: "",
   });
 
-  const [countryCode, setCountryCode] = useState("");
-  const [states, setStates] = useState([]);
+  // const [countryCode, setCountryCode] = useState("");
+  const [states] = useState(State.getStatesOfCountry("IN"));
   const [cities, setCities] = useState([]);
-  const [countries] = useState(Country.getAllCountries());
+  const [branchCities, setBranchCities] = useState({});
+  // const [countries] = useState(Country.getAllCountries());
 
   const [open, setOpen] = useState(false);
   const darkMode = useSelector((state) => state.theme.darkMode);
+  const { users } = useSelector((state) => state.users);
+
+  //console.log(users)
+
+  useEffect(() => {
+    dispatch(fetchAllUsers());
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(fetchShopById(shopId));
@@ -63,8 +79,43 @@ const ShopDetail = () => {
   useEffect(() => {
     if (currentShop) {
       setShop(currentShop);
+      setUserDetails(() => {
+        const details = {};
+        currentShop?.branches?.forEach((branch) => {
+          if (branch.managerId) {
+            details[branch._id] = branch.managerId; // Store managerId initially
+          }
+        });
+        return details;
+      });
+
+      const initialSearch = {};
+      currentShop.branches.forEach((branch) => {
+        initialSearch[branch._id] = branch.managerId?.name || ""; // Initialize with manager name
+      });
+      setSearchTerm(initialSearch);
     }
   }, [currentShop]);
+
+  useEffect(() => {
+    const initialCities = {};
+
+    shop.branches.forEach((branch) => {
+      if (branch.state) {
+        const selectedState = states.find(
+          (state) => state.name === branch.state
+        );
+        if (selectedState) {
+          initialCities[branch._id] = City.getCitiesOfState(
+            "IN",
+            selectedState.isoCode
+          );
+        }
+      }
+    });
+
+    setBranchCities(initialCities);
+  }, [shop.branches, states]); // Runs when shop branches or states change
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -73,14 +124,45 @@ const ShopDetail = () => {
     setShop({ ...shop, [e.target.name]: e.target.value });
   };
 
-  const handleImageUpload = (e) => {
+  // const handleImageUpload = (e) => {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onloadend = () => {
+  //       setShop({ ...shop, logo: reader.result });
+  //     };
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
+
+  const handleImageUpload = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setShop({ ...shop, logo: reader.result });
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const response = await fetch("http://localhost:8000/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (data.imageUrl) {
+        setShop({ ...shop, logo: data.imageUrl });
+
+        // // Send updated image URL to backend to update shop details
+        // await fetch(`http://localhost:8000/api/shop/${shop._id}`, {
+        //   method: "PUT",
+        //   headers: { "Content-Type": "application/json" },
+        //   body: JSON.stringify({ logo: data.imageUrl }),
+        // });
+      } else {
+        alert("Image upload failed");
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
     }
   };
 
@@ -93,44 +175,61 @@ const ShopDetail = () => {
     navigate("/");
   };
 
-  const handleBranchChange = (index, field, value) => {
-    // const updatedBranches = [...shop.branches];
-    // updatedBranches[index][field] = value;
-    // setShop({ ...shop, branches: updatedBranches });
+  // const handleBranchChange = (index, field, value) => {
+  //   // const updatedBranches = [...shop.branches];
+  //   // updatedBranches[index][field] = value;
+  //   // setShop({ ...shop, branches: updatedBranches });
 
-    const updatedBranches = [...shop.branches];
-  
-  // Clone the branch object before modifying it
-  updatedBranches[index] = { ...updatedBranches[index], [field]: value };
-  
-  setShop({ ...shop, branches: updatedBranches });
+  //   const updatedBranches = [...shop.branches];
+
+  //   // Clone the branch object before modifying it
+  //   updatedBranches[index] = { ...updatedBranches[index], [field]: value };
+
+  //   setShop({ ...shop, branches: updatedBranches });
+  // };
+  const handleBranchChange = (branchId, field, value) => {
+    const updatedBranches = shop.branches.map((branch) =>
+      branch._id === branchId ? { ...branch, [field]: value } : branch
+    );
+    console.log(updatedBranches);
+    setShop({ ...shop, branches: updatedBranches });
+
+    // If state is changed, update cities for this branch
+    if (field === "state") {
+      const selectedState = states.find((state) => state.name === value);
+      if (selectedState) {
+        setBranchCities((prevCities) => ({
+          ...prevCities,
+          [branchId]: City.getCitiesOfState("IN", selectedState.isoCode),
+        }));
+      }
+    }
   };
 
   const handleAddBranch = () => {
     const newBranch = {
       name: branch.name,
       address: branch.address,
-      country: branch.country.name,
+      country: "India",
       state: branch.state.name,
       city: branch.city,
       pincode: branch.pincode,
-      managerId: branch.managerId
+      managerId: branch.managerId,
     };
-  
+
     const updatedShop = {
       ...shop,
       branches: [...shop.branches, newBranch],
     };
-  
+
     setShop(updatedShop);
-  
+    console.log(shop);
     // Dispatch update to Redux
     dispatch(updateShop({ id: shopId, updatedData: updatedShop }));
-  
+    dispatch(fetchShopById(shopId));
     // Close the modal after adding
     handleClose();
   };
-  
 
   const handleRemoveBranch = (index) => {
     const updatedBranches = shop.branches.filter((_, i) => i !== index);
@@ -150,6 +249,58 @@ const ShopDetail = () => {
     }, // Focused underline
 
     // "& .MuiFilledInput-root": { backgroundColor: "transparent" }, // Remove background
+  };
+
+  const updateSearchTerm = (branchId, value) => {
+    setSearchTerm((prev) => ({ ...prev, [branchId]: value }));
+  };
+
+  const [filteredUsers, setFilteredUsers] = useState([]);
+
+  // const selectUser = (user) => {
+  //   setSearchTerm(user.name);
+  //   setUserDetails(user);
+  //   setFilteredUsers([]); // Hide suggestions after selection
+  // };
+  const selectUser = (user, branchId) => {
+    if (branchId === "dialog") {
+      setSearchTermDialog(user.name);
+      setUserDetailsDialog(user);
+    } else {
+      updateSearchTerm(branchId, user.name);
+      setUserDetails((prev) => ({
+        ...prev,
+        [branchId]: user, // Branch-wise manager details store kar rahe
+      }));
+    }
+
+    setFilteredUsers([]); // Hide suggestions after selection
+  };
+
+  const handleSearch = (branchId, value) => {
+    updateSearchTerm(branchId, value);
+
+    if (value.length > 0) {
+      const matches = users.filter((user) =>
+        user.name.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredUsers(matches);
+    } else {
+      setFilteredUsers([]);
+    }
+  };
+  const handleSearchD = (e) => {
+    const value = e.target.value;
+    setSearchTermDialog(value);
+
+    if (value.length > 0) {
+      const matches = users.filter((user) =>
+        user.name.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredUsers(matches);
+    } else {
+      setFilteredUsers([]);
+    }
   };
 
   return (
@@ -271,8 +422,12 @@ const ShopDetail = () => {
               sx={{
                 mt: 2,
                 mb: 2,
+                backgroundColor: "#28a745",
+                color: "white",
+                "&:hover": {
+                  backgroundColor: "#218838",
+                },
               }}
-              color="primary"
             >
               Add Branch
             </Button>
@@ -291,7 +446,7 @@ const ShopDetail = () => {
                 color: darkMode ? "white" : "black",
                 borderRadius: "12px",
                 transition: "all 0.3s ease-in-out",
-                height: "70vh",
+                height: "auto",
                 width: { xs: "95vw", sm: "90vw", md: "60vw" },
                 padding: "20px",
                 overflow: "auto",
@@ -316,8 +471,8 @@ const ShopDetail = () => {
                 variant="filled"
                 value={branch.name}
                 onChange={(e) => {
-                    setBranch({ ...branch, name: e.target.value });
-                  }}
+                  setBranch({ ...branch, name: e.target.value });
+                }}
                 sx={textFieldStyles}
               />
 
@@ -330,40 +485,40 @@ const ShopDetail = () => {
                 variant="filled"
                 value={branch.address}
                 onChange={(e) => {
-                    setBranch({ ...branch, address: e.target.value });
-                  }}
+                  setBranch({ ...branch, address: e.target.value });
+                }}
                 required
                 autoFocus
                 sx={textFieldStyles}
               />
 
-              <FormControl fullWidth variant="filled" sx={textFieldStyles} autoFocus  margin="dense">
+              <FormControl
+                fullWidth
+                variant="filled"
+                sx={textFieldStyles}
+                autoFocus
+                margin="dense"
+              >
                 <InputLabel>Country</InputLabel>
-                <Select
-                  value={branch.country || ""}
-                  onChange={(e) => {
-                    setBranch({ ...branch, country: e.target.value});
-                    setCountryCode(e.target.value.isoCode);
-                    setStates(State.getStatesOfCountry(e.target.value.isoCode));
-                  }}
-                  required
-                >
-                  {countries.map((country) => (
-                    <MenuItem key={country.isoCode} value={country}>
-                      {country.name}
-                    </MenuItem>
-                  ))}
+                <Select value="India" required disabled>
+                  <MenuItem value="India">India</MenuItem>
                 </Select>
               </FormControl>
 
-              <FormControl fullWidth variant="filled" sx={textFieldStyles} autoFocus  margin="dense">
+              <FormControl
+                fullWidth
+                variant="filled"
+                sx={textFieldStyles}
+                autoFocus
+                margin="dense"
+              >
                 <InputLabel>State</InputLabel>
                 <Select
                   value={branch.state || ""}
                   onChange={(e) => {
                     setBranch({ ...branch, state: e.target.value });
                     setCities(
-                      City.getCitiesOfState(countryCode, e.target.value.isoCode)
+                      City.getCitiesOfState("IN", e.target.value.isoCode)
                     );
                   }}
                   required
@@ -380,7 +535,13 @@ const ShopDetail = () => {
                 </Select>
               </FormControl>
 
-              <FormControl fullWidth variant="filled" sx={textFieldStyles} autoFocus  margin="dense">
+              <FormControl
+                fullWidth
+                variant="filled"
+                sx={textFieldStyles}
+                autoFocus
+                margin="dense"
+              >
                 <InputLabel>City</InputLabel>
                 <Select
                   value={branch.city || ""}
@@ -411,7 +572,7 @@ const ShopDetail = () => {
                 variant="filled"
                 value={branch.pincode}
                 onChange={(e) => {
-                    setBranch({ ...branch, pincode: e.target.value });
+                  setBranch({ ...branch, pincode: e.target.value });
                 }}
                 required
                 error={branch.pincode && !/^\d{6}$/.test(branch.pincode)}
@@ -422,6 +583,54 @@ const ShopDetail = () => {
                 }
                 sx={textFieldStyles}
               />
+
+              <TextField
+                margin="dense"
+                name="manager"
+                label="Manager Name"
+                type="text"
+                fullWidth
+                autoFocus
+                variant="filled"
+                value={searchTermDialog}
+                onChange={handleSearchD}
+                required
+                error={branch.managerId?.name}
+                helperText={
+                  branch.managerId?.name ? "Choose Manager For Branch." : ""
+                }
+                autoComplete="off"
+                sx={textFieldStyles}
+              />
+
+              {/* Suggestions List */}
+              {filteredUsers.length > 0 && (
+                <ul className="suggestions-list">
+                  {filteredUsers.map((user, index) => (
+                    <li
+                      key={index}
+                      onClick={() => {
+                        selectUser(user, "dialog");
+                        setBranch({ ...branch, managerId: user._id });
+                      }}
+                    >
+                      {user.name || ""}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {userDetailsDialog && (
+                <div className="customer-details">
+                  <div className="detail-col">
+                    <p>
+                      <strong>Name:</strong> {userDetailsDialog.name}
+                    </p>
+                    <p>
+                      <strong>Email:</strong> {userDetailsDialog.email}
+                    </p>
+                  </div>
+                </div>
+              )}
             </DialogContent>
 
             <DialogActions>
@@ -444,8 +653,8 @@ const ShopDetail = () => {
                   !branch.address ||
                   !branch.city ||
                   !branch.state ||
-                  !branch.country ||
-                  !/^\d{6}$/.test(branch.pincode)
+                  !/^\d{6}$/.test(branch.pincode) ||
+                  !branch.managerId
                 }
                 sx={{
                   backgroundColor: "#28a745",
@@ -460,7 +669,7 @@ const ShopDetail = () => {
 
           <Grid container spacing={2}>
             {shop.branches.map((branch, index) => (
-              <Grid item xs={12} key={index}>
+              <Grid item xs={12} key={branch._id}>
                 <div
                   style={{
                     borderRadius: "12px",
@@ -475,7 +684,7 @@ const ShopDetail = () => {
                         label="Branch Name"
                         value={branch.name}
                         onChange={(e) =>
-                          handleBranchChange(index, "name", e.target.value)
+                          handleBranchChange(branch._id, "name", e.target.value)
                         }
                         fullWidth
                         variant="filled"
@@ -490,7 +699,11 @@ const ShopDetail = () => {
                         label="Address"
                         value={branch.address}
                         onChange={(e) =>
-                          handleBranchChange(index, "address", e.target.value)
+                          handleBranchChange(
+                            branch._id,
+                            "address",
+                            e.target.value
+                          )
                         }
                         fullWidth
                         variant="filled"
@@ -501,27 +714,32 @@ const ShopDetail = () => {
                       <FormControl
                         fullWidth
                         variant="filled"
-                        sx={{textFieldStyles}}
+                        sx={{ textFieldStyles }}
                       >
                         <InputLabel>Country</InputLabel>
                         <Select
-                          value={branch.country}
-                          onChange={(e) => {
-                            handleBranchChange(index, "country", e.target.value.name)
+                          value="India"
+                          // onChange={(e) => {
+                          //   handleBranchChange(
+                          //     branch._id,
+                          //     "country",
+                          //     e.target.value.name
+                          //   );
 
-                            setCountryCode(e.target.value.isoCode);
-                            setStates(
-                              State.getStatesOfCountry(e.target.value.isoCode)
-                            );
-                          }}
-                          
+                          //   setCountryCode(e.target.value.isoCode);
+                          //   setStates(
+                          //     State.getStatesOfCountry(e.target.value.isoCode)
+                          //   );
+                          // }}
+                          disabled
                           required
                         >
-                          {countries.map((country) => (
+                          {/* {countries.map((country) => (
                             <MenuItem key={country.isoCode} value={country}>
                               {country.name}
                             </MenuItem>
-                          ))}
+                          ))} */}
+                          <MenuItem value="India">India</MenuItem>
                         </Select>
                       </FormControl>
                     </Grid>
@@ -530,25 +748,24 @@ const ShopDetail = () => {
                       <FormControl
                         fullWidth
                         variant="filled"
-                        sx={{textFieldStyles}}
+                        sx={{ textFieldStyles }}
                       >
                         <InputLabel>State</InputLabel>
+
                         <Select
                           value={branch.state}
                           onChange={(e) => {
-                            handleBranchChange(index, "state", e.target.value.name)
-                            setCities(
-                              City.getCitiesOfState(
-                                countryCode,
-                                e.target.value.isoCode
-                              )
+                            handleBranchChange(
+                              branch._id,
+                              "state",
+                              e.target.value
                             );
                           }}
                           required
                         >
                           {states.length > 0 ? (
                             states.map((state) => (
-                              <MenuItem key={state.isoCode} value={state}>
+                              <MenuItem key={state.isoCode} value={state.name}>
                                 {state.name}
                               </MenuItem>
                             ))
@@ -563,23 +780,25 @@ const ShopDetail = () => {
                       <FormControl
                         fullWidth
                         variant="filled"
-                        sx={{textFieldStyles}}
+                        sx={{ textFieldStyles }}
                       >
                         <InputLabel>City</InputLabel>
                         <Select
                           value={branch.city}
                           onChange={(e) => {
-                            handleBranchChange(index, "address", e.target.value)
+                            handleBranchChange(
+                              branch._id,
+                              "city",
+                              e.target.value
+                            );
                           }}
                           required
                         >
-                          {cities.length > 0 ? (
-                            cities.map((city) => (
-                              <MenuItem key={city.name} value={city.name}>
-                                {city.name}
-                              </MenuItem>
-                            ))
-                          ) : (
+                          {branchCities[branch._id]?.map((city) => (
+                            <MenuItem key={city.name} value={city.name}>
+                              {city.name}
+                            </MenuItem>
+                          )) || (
                             <MenuItem disabled>No cities available</MenuItem>
                           )}
                         </Select>
@@ -590,14 +809,64 @@ const ShopDetail = () => {
                         label="Pincode"
                         value={branch.pincode}
                         onChange={(e) =>
-                          handleBranchChange(index, "pincode", e.target.value)
+                          handleBranchChange(
+                            branch._id,
+                            "pincode",
+                            e.target.value
+                          )
                         }
                         fullWidth
                         variant="filled"
                         sx={textFieldStyles}
                       />
                     </Grid>
-                    <Grid item xs={6} display="flex" justifyContent="flex-end">
+                    <Grid item xs={12}>
+                      <TextField
+                        label="Manager"
+                        value={searchTerm[branch._id] || ""}
+                        onChange={(e) =>
+                          handleSearch(branch._id, e.target.value)
+                        }
+                        fullWidth
+                        variant="filled"
+                        sx={textFieldStyles}
+                      />
+                      {/* Suggestions List */}
+                      {filteredUsers.length > 0 && (
+                        <ul className="suggestions-list">
+                          {filteredUsers.map((user, index) => (
+                            <li
+                              key={index}
+                              onClick={() => {
+                                selectUser(user, branch._id);
+                                handleBranchChange(
+                                  branch._id,
+                                  "managerId",
+                                  user._id
+                                );
+                              }}
+                            >
+                              {user.name || ""}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                      {userDetails[branch._id] && (
+                        <div className="customer-details">
+                          <div className="detail-col">
+                            <p>
+                              <strong>Name:</strong>{" "}
+                              {userDetails[branch._id].name}
+                            </p>
+                            <p>
+                              <strong>Email:</strong>{" "}
+                              {userDetails[branch._id].email}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </Grid>
+                    <Grid item xs={12} display="flex" justifyContent="flex-end">
                       <Button
                         onClick={() => handleRemoveBranch(index)}
                         sx={{
@@ -628,8 +897,15 @@ const ShopDetail = () => {
           <Button
             variant="contained"
             color="primary"
-            startIcon={<Save size={18} />}
+            startIcon={<Pencil size={18} />}
             onClick={handleUpdate}
+            sx={{
+              backgroundColor: "#28a745",
+              color: "white",
+              "&:hover": {
+                backgroundColor: "#218838",
+              },
+            }}
           >
             Update
           </Button>

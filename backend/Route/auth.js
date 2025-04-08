@@ -112,7 +112,7 @@ router.post("/register", async (req, res) => {
             email,
             password: hashedPassword,
             isVerified: false,
-            googleId:name
+        
         });
 
         await newUser.save();
@@ -154,7 +154,7 @@ router.post("/forgot-password", async (req, res) => {
         if (!user) return res.status(404).json({ message: "User not found" });
 
         // JWT token generate with expiry
-        const resetToken = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "10m" });
+        const resetToken = jwt.sign({ id: user._id ,name:user.name,email:user.email}, JWT_SECRET, { expiresIn: "10m" });
 
         const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
 
@@ -244,7 +244,7 @@ router.get(
             return res.redirect(`${CLIENT_URL}/login?error=AuthFailed`);
         }
 
-        const accessToken = jwt.sign({ id: req.user._id ,name:req.user.name,email:req.user.email}, process.env.JWT_SECRET, { expiresIn: "15m" });
+        const accessToken = jwt.sign({ id: req.user._id ,name:req.user.name,email:req.user.email,role:req.user.role}, process.env.JWT_SECRET, { expiresIn: "15m" });
         const refreshToken = jwt.sign({ id: req.user._id }, process.env.REFRESH_SECRET, { expiresIn: "7d" });
 
         res.cookie("refreshToken", refreshToken, {

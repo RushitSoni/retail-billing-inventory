@@ -1,5 +1,5 @@
 .verify-container {
-    width: 100vw;
+    width: 100%;
     min-height: 70vh;
     display: flex;
     justify-content: center !important;
@@ -21,13 +21,12 @@
   
   .hero-section {
     margin-top: 0;
-    margin-bottom: 1rem;
+    margin-bottom: 0.2rem;
   }
   
   .verify-box {
     padding: 3rem;
-    width: 100%;
-    max-width: 25rem;
+    width: 15rem;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     transition: background 0.3s ease-in-out;

@@ -32,16 +32,18 @@ const GoogleAuthSuccess = () => {
       // Redirect to login if tokens are missing
       navigate("/login");
     }
-  }, [searchParams, navigate]);
 
-  const handleExplore = async () => {
     try {
       const decoded = jwtDecode(searchParams.get("accessToken")); // ✅ Decode JWT Token
-      dispatch(setUser({ id: decoded.id, name: decoded.name, email: decoded.email })); // ✅ Update Redux User
+      dispatch(setUser({ id: decoded.id, name: decoded.name, email: decoded.email,role: decoded.role })); // ✅ Update Redux User
     } catch (error) {
       console.error("Invalid token:", error);
       navigate("/login"); // If decoding fails, redirect to login
     }
+  }, [dispatch,searchParams, navigate]);
+
+  const handleExplore = async () => {
+   
     navigate("/");
   };
 

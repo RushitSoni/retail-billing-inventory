@@ -1,0 +1,96 @@
+.profile-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 85vh;
+    width: 100%;
+    padding: 3rem 1rem;
+    transition: background 0.3s ease-in-out;
+    background: #f4f4f4;
+    color: #333;
+    box-sizing: border-box;
+}
+
+.dark {
+    background: #1a1a1a;
+    color: white;
+}
+
+.light {
+    background: #f4f4f4;
+    color: black;
+}
+
+.profile-card {
+    position: relative;
+    padding:1rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    width: 60%;
+}
+
+.dark .profile-card {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  
+.light .profile-card{
+    background: white;
+}
+
+.profile-row {
+    margin-bottom: 0.8rem;
+  }
+
+  .name-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .name-row .input-field {
+    flex: 1;
+  }
+  
+  .update-btn {
+    white-space: nowrap;
+  }
+  .details-btn {
+    background: white;
+    border: none;
+    cursor: pointer;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+  }
+  
+  .dark .details-btn {
+    background: black;
+  }
+  
+  .light .details-btn {
+    background: white;
+  }
+  
+  .dark .details-btn svg {
+    color: white;
+    transition: color 0.3s ease;
+  }
+  
+  .light .details-btn svg {
+    color: black;
+    transition: color 0.3s ease;
+  }
+  
+  .details-btn:hover svg {
+    color: #28a745;
+  }
+  
+
+ 
+  
+ 
+ 

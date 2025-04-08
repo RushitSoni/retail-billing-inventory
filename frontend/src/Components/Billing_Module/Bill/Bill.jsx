@@ -23,11 +23,12 @@ import {
 } from "../../../Redux/Slices/customerSlice";
 import { addBill } from "../../../Redux/Slices/billSlice";
 import { Country, State, City } from "country-state-city";
-import { Eye } from "lucide-react";
+import { Eye, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { fetchShops } from "../../../Redux/Slices/shopSlice";
 import { fetchInventoryByShopAndBranch } from "../../../Redux/Slices/inventorySlice";
 import { reduceInventoryStock } from "../../../Redux/Slices/inventorySlice";
+import { addAuditLog } from "../../../Redux/Slices/auditLogSlice";
 
 export default function BillingPage() {
   const darkMode = useSelector((state) => state.theme.darkMode);
@@ -35,6 +36,7 @@ export default function BillingPage() {
   const navigate = useNavigate();
 
   const shops = useSelector((state) => state.shops.list);
+  const user = useSelector((state) => state.auth.user);
   const initialProducts = useSelector((state) => state.inventory.list);
   const [selectedShop, setSelectedShop] = useState("");
   const [selectedBranch, setSelectedBranch] = useState("");
@@ -90,8 +92,18 @@ export default function BillingPage() {
     state: "",
     country: "",
     pincode: "",
+    biller: user._id,
+    shopId: "",
+    branchId: "",
   });
-  const handleOpen = () => setOpen(true);
+  const handleOpen = () => {
+    if (!selectedShop || !selectedBranch) {
+      alert("Please ! select shop and branch of customer first.");
+      return
+    }
+    setOpen(true);
+    
+  };
   const handleClose = () => setOpen(false);
   const handleChange = (e) => {
     setCustomer({ ...customer, [e.target.name]: e.target.value });
@@ -101,6 +113,8 @@ export default function BillingPage() {
       ...customer, // Keep all other fields unchanged
       state: customer.state.name,
       country: customer.country.name,
+      shopId: selectedShop._id,
+      branchId: selectedBranch._id,
     };
     dispatch(addCustomer(customerData));
     handleClose();
@@ -142,17 +156,13 @@ export default function BillingPage() {
   };
 
   const addItemToBill = (item) => {
-
-    if(item.stock){
+    if (item.stock) {
       setSelectedItems([...selectedItems, { ...item, quantity: 1 }]);
       setItemSearch("");
       setFilteredItems([]);
+    } else {
+      alert("Out of Stock !");
     }
-    else{
-      alert("Out of Stock !")
-    }
-    
-   
   };
 
   const updateItemQuantity = (index, newQuantity) => {
@@ -166,11 +176,11 @@ export default function BillingPage() {
   };
 
   const CGST = selectedItems.reduce(
-    (cgst, item) => cgst + 0.01 * item.gst * item.price,
+    (cgst, item) => cgst + 0.01 * item.cgst * item.price,
     0
   );
   const SGST = selectedItems.reduce(
-    (sgst, item) => sgst + 0.01 * item.gst * item.price,
+    (sgst, item) => sgst + 0.01 * item.sgst * item.price,
     0
   );
 
@@ -224,6 +234,9 @@ export default function BillingPage() {
 
     const billData = {
       customer: customerDetails?._id || "",
+      biller: user._id,
+      shopId: selectedShop._id,
+      branchId: selectedBranch._id,
       items: selectedItems.map((item) => ({
         name: item.name,
         price: item.price,
@@ -240,20 +253,45 @@ export default function BillingPage() {
           }
         : { enabled: false },
     };
+    console.log(billData);
+    dispatch(addBill(billData))
+      .unwrap() // Waits for promise resolution and throws if rejected
+      .then(() => {
+        dispatch(
+          reduceInventoryStock({
+            items: selectedItems.map((item) => ({
+              id: item._id,
+              quantity: item.quantity,
+            })),
+          })
+        );
+      })
+      .catch((error) => {
+        console.error("Failed to add bill:", error);
+      });
 
-    dispatch(addBill(billData));
+    // dispatch(addBill(billData)).then();
+    // dispatch(
+    //   reduceInventoryStock({
+    //     items: selectedItems.map((item) => ({
+    //       id: item._id,
+    //       quantity: item.quantity,
+    //     })),
+    //   })
+
+    // );
     dispatch(
-      reduceInventoryStock({
-        items: selectedItems.map((item) => ({
-          id: item._id,
-          quantity: item.quantity,
-        })),
+      addAuditLog({
+        user: user.name,
+        operation: "CREATE",
+        module: "Bill",
+        message: "Added new Bill.",
       })
     );
 
     generateInvoice(
-      "Gayatri Jewellers",
-      "Rushit Soni",
+      selectedShop,
+      user.name,
       customerDetails,
       selectedItems,
       grandTotal,
@@ -357,6 +395,7 @@ export default function BillingPage() {
         <Box display="flex" justifyContent="flex-end">
           <Button
             variant="contained"
+            startIcon={<Plus />}
             color="primary"
             onClick={handleOpen}
             sx={{
@@ -802,9 +841,9 @@ export default function BillingPage() {
               <span>Price</span>
               <span>Quantity</span>
               <span>Available</span>
-              <span>CGST</span>
-              <span>SGST</span>
-              <span>Discount</span>
+              <span>CGST(%)</span>
+              <span>SGST(%)</span>
+              <span>Discount(%)</span>
               <span>Actions</span>
             </div>
             {selectedItems.length > 0 &&
@@ -821,14 +860,14 @@ export default function BillingPage() {
                       // if (value < 1) value = 1; // Prevent going below min value
                       updateItemQuantity(index, value);
                     }}
-                    min={1} 
+                    min={1}
                     max={item.stock}
                     disabled={item.stock === 0} // Disables input when stock is 0
                   />
 
                   <span>{item.stock}</span>
-                  <span>{item.gst}</span>
-                  <span>{item.gst}</span>
+                  <span>{item.cgst}</span>
+                  <span>{item.sgst}</span>
                   <span>{item.discount}</span>
                   <button onClick={() => deleteItem(index)}>Delete</button>
                 </div>

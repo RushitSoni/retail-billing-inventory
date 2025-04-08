@@ -18,7 +18,7 @@ const VerifyEmail = () => {
     const verifyEmail = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/api/verify-email/${token}`
+          `http://localhost:8000/api/auth/verify-email/${token}`
         );
         console.log(response)
 
@@ -48,15 +48,15 @@ const VerifyEmail = () => {
     <div className={`verify-container ${darkMode ? "dark-mode" : "light-mode"}`}>
       <motion.div
         className="hero-section"
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, x: -50 }}
+        animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 1 }}
       >
         <h1>Email Verification</h1>
       </motion.div>
 
       <motion.div
-        initial={{ opacity: 0, y: -50 }}
+        initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
         whileHover={{ scale: 1.025 }}

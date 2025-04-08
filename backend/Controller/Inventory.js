@@ -25,7 +25,7 @@ exports.getInventoryById = async (req, res) => {
 // Add a new inventory item (Validates branch ID inside shop)
 exports.addInventory = async (req, res) => {
   try {
-    const { name, price, stock, gst, discount, shopId, branchId, itemId } = req.body;
+    const { name, price, stock, cgst,sgst, discount, shopId, branchId, itemId } = req.body;
 
     // Validate if shop exists
     const shop = await Shop.findById(shopId);
@@ -35,10 +35,11 @@ exports.addInventory = async (req, res) => {
     const branchExists = shop.branches.some(branch => branch._id.toString() === branchId);
     if (!branchExists) return res.status(400).json({ message: "Invalid branch ID for this shop" });
 
-    const newItem = new Inventory({ name, price, stock, gst, discount, shopId, branchId, itemId });
+    const newItem = new Inventory({ name, price, stock, cgst,sgst, discount, shopId, branchId, itemId });
     await newItem.save();
     res.status(201).json(newItem);
   } catch (error) {
+    console.log(error.message)
     res.status(400).json({ message: error.message });
   }
 };
@@ -50,6 +51,7 @@ exports.updateInventory = async (req, res) => {
     if (!updatedItem) return res.status(404).json({ message: "Item not found" });
     res.json(updatedItem);
   } catch (error) {
+    console.log(error.message)
     res.status(500).json({ message: error.message });
   }
 };
@@ -79,6 +81,21 @@ exports.getInventoryByShopAndBranch = async (req, res) => {
       res.status(500).json({ message: "Failed to fetch inventory by shop and branch", error: error.message });
   }
 };
+
+exports.getInventoryByShop = async (req, res) => {
+  try {
+      const { shopId } = req.params;
+      const filter = {};
+
+      if (shopId) filter.shopId = shopId;
+      
+      const inventory = await Inventory.find(filter);
+      res.status(200).json(inventory);
+  } catch (error) {
+      res.status(500).json({ message: "Failed to fetch inventory by shop and branch", error: error.message });
+  }
+};
+
 
 
 

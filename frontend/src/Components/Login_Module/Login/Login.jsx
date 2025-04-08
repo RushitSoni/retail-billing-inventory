@@ -15,6 +15,13 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const {  error } = useSelector((state) => state.auth);
 
+  useEffect(()=>{
+    if(error){
+        alert(error)
+    }
+  },[dispatch,error])
+  
+
   const handleLogin = (e) => {
     e.preventDefault();
     dispatch(loginUser({ email, password }));
@@ -55,7 +62,7 @@ const Login = () => {
         whileHover={{ scale: 1.025 }}
       >
         <Paper className="login-box" elevation={3}>
-          {error && <p style={{ color: "red" }}>{error}</p>}
+          {/* {error && <p style={{ color: "red" }}>{error}</p>} */}
           <form onSubmit={handleLogin}>
             <motion.div
               initial={{ opacity: 0, x: 50 }}
