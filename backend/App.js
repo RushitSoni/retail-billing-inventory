@@ -67,6 +67,6 @@ app.use("/api/audit-logs",auditLogRoutes)
 
 
 
-app.listen(()=>{
+app.listen(PORT,()=>{
     console.log(`Server started at ${process.env.BACKEND_SERVER_URL}`)
 })
