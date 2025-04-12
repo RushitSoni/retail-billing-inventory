@@ -50,7 +50,7 @@ export default function SignUp() {
     }
   };
   const handleG = () => {
-    window.open(`${process.env.FrontEnd_URL}/api/auth/google/signup`, "_self");
+    window.open(`${process.env.REACT_APP_API_BASE_URL}/api/auth/google/signup`, "_self");
   };
 
   return (
