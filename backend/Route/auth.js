@@ -27,7 +27,7 @@ router.post("/login", async (req, res) => {
         // ✅ Check Email Verification
         if (!user.isVerified) {
             const token = jwt.sign({ id: user._id }, ACCESS_SECRET, { expiresIn: "1h" });
-            const verificationLink = `${process.env.CLIENT_URL}/verify-email/${token}`;
+            const verificationLink = `${CLIENT_URL}/verify-email/${token}`;
             await sendEmail(email, "Verify Your Email", `Click here to verify: ${verificationLink}`);
             return res.status(403).json({ 
                 message: "Please verify your email first. A new verification link has been sent.", 
@@ -120,7 +120,7 @@ router.post("/register", async (req, res) => {
         // Generate JWT Token
         const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
-        const verificationLink = `${process.env.CLIENT_URL}/verify-email/${token}`;
+        const verificationLink = `${CLIENT_URL}/verify-email/${token}`;
         const emailContent = `
             <h2>Welcome to BizTrack, ${newUser.name}!</h2>
             <p>Click the link below to verify your email:</p>
@@ -156,7 +156,7 @@ router.post("/forgot-password", async (req, res) => {
         // JWT token generate with expiry
         const resetToken = jwt.sign({ id: user._id ,name:user.name,email:user.email}, JWT_SECRET, { expiresIn: "10m" });
 
-        const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
+        const resetUrl = `${CLIENT_URL}/reset-password/${resetToken}`;
 
         // Use sendEmail function
         await sendEmail(

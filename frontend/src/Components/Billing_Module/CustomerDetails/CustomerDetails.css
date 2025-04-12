@@ -8,7 +8,7 @@
     transition: background 0.3s ease-in-out;
     background: #f4f4f4;
     color: #333;
-    box-sizing: border-box;
+    box-sizing: border-box !important;
   }
   
   .dark{
@@ -37,7 +37,7 @@
 
   .contact-section,.address-section{
     position: relative;
-    width: 82vw;
+    width: auto;
     padding:2rem;
    
     border-radius: 8px;
@@ -89,12 +89,12 @@
   }
   
   .update-btn {
-    background: #007bff;
+    background:#28a745;
     color: white;
   }
   
   .update-btn:hover {
-    background: #0056b3;
+    background: #218838;
   }
   
   .delete-btn {

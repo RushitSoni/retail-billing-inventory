@@ -20,7 +20,7 @@ const getBase64FromUrl = async (url) => {
 };
 
 
-const generateInvoice = async(shopDetails, billMaker, customerDetails, billItems, grandTotal, installments) => {
+const generateInvoice = async(shopDetails,branch, billMaker, customerDetails, billItems, grandTotal, installments) => {
     const doc = new jsPDF();
    
     
@@ -53,7 +53,7 @@ const generateInvoice = async(shopDetails, billMaker, customerDetails, billItems
     doc.text(`Time: ${new Date().toLocaleTimeString()}`, 140, 40);
     doc.text(`Date: ${new Date().toLocaleDateString()}`, 140, 50);   
     
-    doc.text(`Branch    : Dabhoi`, 25, 40);
+    doc.text(`Branch    : ${branch.name}`, 25, 40);
     doc.text(`Bill Maker: ${billMaker}`, 25, 50);
 
     // Customer Details in Two Columns
@@ -64,12 +64,18 @@ const generateInvoice = async(shopDetails, billMaker, customerDetails, billItems
     doc.text(`Name  : ${customerDetails.name}`, 25, 75);
     doc.text(`Phone : ${customerDetails.phone}`, 25, 85);
     // Right Column (Aligned at x = 110)
-    doc.text(`Email  : ${customerDetails.email}`, 140, 75);
-    doc.text(`Address: ${customerDetails.address}`, 140, 85);
-
+    const rightColX = 140;
+    const maxRightWidth = 50; // adjust width to prevent overflow
+    
+    doc.text(`Email  :`, rightColX, 75);
+    doc.text(doc.splitTextToSize(customerDetails.email, maxRightWidth), rightColX +20, 75);
+    
+    doc.text(`Address:`, rightColX, 85);
+    doc.text(doc.splitTextToSize(customerDetails.address, maxRightWidth), rightColX + 20, 85);
+    
     // Table for Bill Items
     autoTable(doc, {
-        startY: 95,
+        startY: 105,
         head: [
             ["Item Number", "Item Name", "Price (Rs.)", "Quantity", "Total (Rs.)"]
         ],
@@ -85,7 +91,7 @@ const generateInvoice = async(shopDetails, billMaker, customerDetails, billItems
 
     // Grand Total
     doc.setFont("helvetica", "bold");
-    doc.text(`Grand Total: Rs. ${grandTotal}`, 20, doc.lastAutoTable.finalY + 10);
+    doc.text(`Grand Total: Rs. ${grandTotal}`, 20, doc.lastAutoTable.finalY + 15);
 
     // Page 2: Installments (if applicable)
     if (installments && installments.length > 1) {
@@ -113,10 +119,10 @@ const generateInvoice = async(shopDetails, billMaker, customerDetails, billItems
    // Prepare FormData to send to the backend
    const formData = new FormData();
    formData.append("file", pdfBlob, "invoice.pdf");
-   formData.append("email", "rushitpsoni2002@gmail.com");
+   formData.append("email", customerDetails.email);
 
    try {
-       const response = await fetch("http://localhost:8000/send-invoice-email", {
+       const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/send-invoice-email`, {
            method: "POST",
            body: formData,
        });

@@ -19,16 +19,17 @@ import "./Bill.css";
 import generateInvoice from "../../../utils/invoiceGenerator";
 import {
   addCustomer,
-  fetchCustomers,
+  fetchCustomerByShopAndBranch,
 } from "../../../Redux/Slices/customerSlice";
 import { addBill } from "../../../Redux/Slices/billSlice";
 import { Country, State, City } from "country-state-city";
 import { Eye, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { fetchShops } from "../../../Redux/Slices/shopSlice";
+import { fetchUserShops } from "../../../Redux/Slices/shopSlice";
 import { fetchInventoryByShopAndBranch } from "../../../Redux/Slices/inventorySlice";
 import { reduceInventoryStock } from "../../../Redux/Slices/inventorySlice";
 import { addAuditLog } from "../../../Redux/Slices/auditLogSlice";
+import Toast from "../../Shared_Module/Toast/Toast";
 
 export default function BillingPage() {
   const darkMode = useSelector((state) => state.theme.darkMode);
@@ -38,34 +39,11 @@ export default function BillingPage() {
   const shops = useSelector((state) => state.shops.list);
   const user = useSelector((state) => state.auth.user);
   const initialProducts = useSelector((state) => state.inventory.list);
+  const { list } = useSelector((state) => state.customers);
+
   const [selectedShop, setSelectedShop] = useState("");
   const [selectedBranch, setSelectedBranch] = useState("");
   const [products, setProducts] = useState("");
-
-  useEffect(() => {
-    if (selectedShop && selectedBranch) {
-      dispatch(
-        fetchInventoryByShopAndBranch({
-          shopId: selectedShop._id,
-          branchId: selectedBranch._id,
-        })
-      );
-    }
-  }, [selectedShop, selectedBranch, dispatch]);
-  // console.log("Redux State",Array.isArray(initialProducts))
-  useEffect(() => {
-    setProducts(initialProducts);
-  }, [initialProducts]);
-
-  useEffect(() => {
-    dispatch(fetchShops());
-  }, [dispatch]);
-
-  const { list } = useSelector((state) => state.customers);
-  useEffect(() => {
-    dispatch(fetchCustomers());
-  }, [dispatch]);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredCustomers, setFilteredCustomers] = useState([]);
   const [customerDetails, setCustomerDetails] = useState(null);
@@ -96,15 +74,53 @@ export default function BillingPage() {
     shopId: "",
     branchId: "",
   });
+  const [toast, setToast] = useState({
+    open: false,
+    message: "",
+    type: "success",
+  });
+
+  useEffect(() => {
+    if (selectedShop && selectedBranch) {
+      dispatch(
+        fetchInventoryByShopAndBranch({
+          shopId: selectedShop._id,
+          branchId: selectedBranch._id,
+        })
+      );
+    }
+  }, [selectedShop, selectedBranch, dispatch]);
+
+  useEffect(() => {
+    setProducts(initialProducts);
+  }, [initialProducts]);
+
+  useEffect(() => {
+    dispatch(fetchUserShops(user._id));
+  }, [dispatch, user]);
+
+  useEffect(() => {
+    dispatch(
+      fetchCustomerByShopAndBranch({
+        shopId: selectedShop._id,
+        branchId: selectedBranch._id,
+      })
+    );
+  }, [selectedShop, selectedBranch, dispatch]);
+
+  const showToast = (msg, type) => {
+    setToast({ open: true, message: msg, type });
+  };
+
   const handleOpen = () => {
     if (!selectedShop || !selectedBranch) {
       alert("Please ! select shop and branch of customer first.");
-      return
+      return;
     }
     setOpen(true);
-    
   };
   const handleClose = () => setOpen(false);
+
   const handleChange = (e) => {
     setCustomer({ ...customer, [e.target.name]: e.target.value });
   };
@@ -116,11 +132,21 @@ export default function BillingPage() {
       shopId: selectedShop._id,
       branchId: selectedBranch._id,
     };
-    dispatch(addCustomer(customerData));
+    dispatch(addCustomer(customerData)).then(() => {
+      dispatch(
+        addAuditLog({
+          user: user.name,
+          operation: "CREATE",
+          module: "Bill",
+          message: `Added new customer ${customerData.name} in Branch ${selectedBranch.name} of Shop ${selectedShop.name} .`,
+        })
+      );
+
+      showToast("Customer added successfully!", "success");
+    });
     handleClose();
   };
 
-  // Dummy customers (Replace this with actual DB fetching logic)
   const customers = list;
 
   const handleSearch = (event) => {
@@ -156,6 +182,16 @@ export default function BillingPage() {
   };
 
   const addItemToBill = (item) => {
+
+    const alreadyAdded = selectedItems.some((i) => i._id === item._id);
+
+    if (alreadyAdded) {
+      alert("Item already added to the bill!");
+      setItemSearch("");
+      setFilteredItems([]);
+      return;
+    }
+
     if (item.stock) {
       setSelectedItems([...selectedItems, { ...item, quantity: 1 }]);
       setItemSearch("");
@@ -270,27 +306,19 @@ export default function BillingPage() {
         console.error("Failed to add bill:", error);
       });
 
-    // dispatch(addBill(billData)).then();
-    // dispatch(
-    //   reduceInventoryStock({
-    //     items: selectedItems.map((item) => ({
-    //       id: item._id,
-    //       quantity: item.quantity,
-    //     })),
-    //   })
-
-    // );
     dispatch(
       addAuditLog({
         user: user.name,
         operation: "CREATE",
         module: "Bill",
-        message: "Added new Bill.",
+        message: `Added new Bill for Branch ${selectedBranch.name} of Shop ${selectedShop.name}.`,
       })
     );
+    showToast("Bill Generated successfully!", "success");
 
     generateInvoice(
       selectedShop,
+      selectedBranch,
       user.name,
       customerDetails,
       selectedItems,
@@ -299,6 +327,8 @@ export default function BillingPage() {
     );
 
     setSelectedItems([]);
+    setItemSearch("");
+    setFilteredItems([]);
     setCustomerDetails(null);
     setSearchTerm("");
   }
@@ -343,6 +373,11 @@ export default function BillingPage() {
                   onChange={(e) => {
                     setSelectedShop(e.target.value);
                     setSelectedBranch(""); // Reset branch when shop changes
+                    setSelectedItems([]);
+                    setCustomerDetails(null);
+                    setSearchTerm("")
+                    setItemSearch("");
+                    setFilteredItems([]);
                   }}
                 >
                   {shops.map((shop) => (
@@ -377,8 +412,13 @@ export default function BillingPage() {
                 <Select
                   value={selectedBranch?.name}
                   onChange={(e) => {
-                    console.log(e.target.value, selectedShop["branches"]);
+                    //console.log(e.target.value, selectedShop["branches"]);
                     setSelectedBranch(e.target.value);
+                    setSelectedItems([]);
+                    setCustomerDetails(null);
+                    setSearchTerm("")
+                    setItemSearch("");
+                    setFilteredItems([]);
                   }}
                   disabled={!selectedShop} // Disable if no shop selected
                 >
@@ -569,23 +609,22 @@ export default function BillingPage() {
                 }, // Focused underline
               }}
             >
-              <InputLabel>City</InputLabel>
+              <InputLabel>Country</InputLabel>
               <Select
-                value={customer.city}
-                onChange={(e) =>
-                  setCustomer({ ...customer, city: e.target.value })
-                }
+                value={customer.country || ""}
+                onChange={(e) => {
+                  setCustomer({ ...customer, country: e.target.value });
+
+                  setCountryCode(e.target.value.isoCode);
+                  setStates(State.getStatesOfCountry(e.target.value.isoCode));
+                }}
                 required
               >
-                {cities.length > 0 ? (
-                  cities.map((city) => (
-                    <MenuItem key={city.name} value={city.name}>
-                      {city.name}
-                    </MenuItem>
-                  ))
-                ) : (
-                  <MenuItem disabled>No cities available</MenuItem>
-                )}
+                {countries.map((country) => (
+                  <MenuItem key={country.isoCode} value={country}>
+                    {country.name}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
 
@@ -628,7 +667,6 @@ export default function BillingPage() {
                 )}
               </Select>
             </FormControl>
-
             <FormControl
               fullWidth
               variant="filled"
@@ -646,22 +684,23 @@ export default function BillingPage() {
                 }, // Focused underline
               }}
             >
-              <InputLabel>Country</InputLabel>
+              <InputLabel>City</InputLabel>
               <Select
-                value={customer.country || ""}
-                onChange={(e) => {
-                  setCustomer({ ...customer, country: e.target.value });
-
-                  setCountryCode(e.target.value.isoCode);
-                  setStates(State.getStatesOfCountry(e.target.value.isoCode));
-                }}
+                value={customer.city}
+                onChange={(e) =>
+                  setCustomer({ ...customer, city: e.target.value })
+                }
                 required
               >
-                {countries.map((country) => (
-                  <MenuItem key={country.isoCode} value={country}>
-                    {country.name}
-                  </MenuItem>
-                ))}
+                {cities.length > 0 ? (
+                  cities.map((city) => (
+                    <MenuItem key={city.name} value={city.name}>
+                      {city.name}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem disabled>No cities available</MenuItem>
+                )}
               </Select>
             </FormControl>
 
@@ -762,7 +801,8 @@ export default function BillingPage() {
           {filteredCustomers.length > 0 && (
             <ul className="suggestions-list">
               {filteredCustomers.map((customer, index) => (
-                <li key={index} onClick={() => selectCustomer(customer)}>
+                <li key={index} onClick={() => {selectCustomer(customer);setSelectedItems([]);setItemSearch("");
+                  setFilteredItems([]);}}>
                   {customer.name}
                 </li>
               ))}
@@ -792,11 +832,21 @@ export default function BillingPage() {
                 </p>
               </div>
               <div className="detail-col action-col">
-                <Eye
-                  className="view-details-icon"
-                  size={24}
+                <Button
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#28a745",
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor: "#218838",
+                    },
+                  }}
+                  startIcon={<Eye size={18} />}
                   onClick={() => navigate(`/customer/${customerDetails._id}`)}
-                />
+                  className="view-details-icon"
+                >
+                  View
+                </Button>
               </div>
             </div>
           )}
@@ -965,6 +1015,12 @@ export default function BillingPage() {
           </button>
         </div>
       </motion.div>
+      <Toast
+        open={toast.open}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast({ ...toast, open: false })}
+      />
     </div>
   );
 }

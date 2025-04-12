@@ -6,20 +6,48 @@ import { useSelector,useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import {resetPassword} from "../../../Redux/Slices/authSlice"
 import { jwtDecode } from "jwt-decode";
+import Toast from "../../Shared_Module/Toast/Toast";
+import { addAuditLog } from "../../../Redux/Slices/auditLogSlice";
 
 export default function ResetPassword() {
   const darkMode = useSelector((state) => state.theme.darkMode);
   const [newPassword, setNewPassword] = useState("");
   const { token } = useParams();
   const decoded = jwtDecode(token); // ✅ Decode JWT Token
-  console.log(decoded)
+  // console.log(decoded)
     const dispatch = useDispatch();
     const navigate = useNavigate()
     const { message, error } = useSelector((state) => state.auth);
+    const [toast, setToast] = useState({ open: false, message: "", type: "success" });
+  
+    const showToast = (msg, type) => {
+      setToast({ open: true, message: msg, type });
+    };
+  
+   
+  
+  
 
-    const handleReset = (e) => {
-      e.preventDefault();
-      dispatch(resetPassword({ token, newPassword }));
+    const handleReset = async (e) => {
+      try{
+        e.preventDefault();
+        await dispatch(resetPassword({ token, newPassword })).unwrap();
+
+        await  dispatch(
+          addAuditLog({
+            user: decoded.name,
+            operation: "UPDATE",
+            module: "Login",
+            message: "Password Reset.",
+          })
+        );
+
+        showToast("Password Reset successfully!", "success")
+      }
+      catch(err){
+        console.log(err)
+      }
+
     };
 
    
@@ -140,6 +168,8 @@ export default function ResetPassword() {
             {error && <p style={{ color: "red" }}>{error}</p>}
         </Paper>
       </motion.div>
+      <Toast open={toast.open} message={toast.message} type={toast.type} onClose={() => setToast({ ...toast, open: false })} />
+
     </div>
   );
 }

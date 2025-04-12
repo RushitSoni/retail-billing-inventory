@@ -142,9 +142,9 @@ exports.getUserShops = async (req, res) => {
       .populate("branches.managerId") // Fetches full manager details
       const filteredManagerShops = managerShops.map(shop => ({
           ...shop.toObject(),
-          branches: shop.branches.filter(branch => branch.managerId._id == userId)
+          branches: shop.branches?.filter(branch => branch.managerId?._id == userId)
       }));
-      console.log(filteredManagerShops)
+      // console.log(filteredManagerShops)
       // Fetch shops where the user is in billingStaffIds (Include only relevant branches)
       const billingShops = await Shop.find({ "branches.billingStaffIds": userId })
       .populate("owner") // Fetches full owner details
@@ -172,7 +172,7 @@ exports.getUserShops = async (req, res) => {
 
       res.json(Array.from(shopMap.values()));
   } catch (error) {
-      console.error("Error fetching shops:", error);
+      console.log("Error fetching shops:", error.message);
       res.status(500).json({ error: "Internal Server Error" });
   }
 };

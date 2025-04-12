@@ -3,7 +3,7 @@ import axios from "axios";
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const API = axios.create({ baseURL: API_BASE_URL, withCredentials: true });
 
-// ✅ Request Interceptor (Attach Access Token)
+//Request Interceptor (Attach Access Token)
 API.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
@@ -15,29 +15,43 @@ API.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ✅ Response Interceptor (Auto Refresh Token)
+//Response Interceptor (Auto Refresh Token)
 API.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 403) {
+    const originalRequest = error.config;
+
+    //Prevent infinite loop by checking a flag
+    if (
+      error.response?.status === 403 &&
+      !originalRequest._retry &&
+      !originalRequest.url.includes("/api/login/refresh")
+    ) {
+      originalRequest._retry = true; // Mark as retried once
+
       try {
-        // 🔄 Refresh Token API Call
-        const refreshResponse = await axios.post(`${API_BASE_URL}/api/login/refresh`, {}, { withCredentials: true });
+        const refreshResponse = await axios.post(
+          `${API_BASE_URL}/api/login/refresh`,
+          {},
+          { withCredentials: true }
+        );
 
         const newAccessToken = refreshResponse.data.accessToken;
         localStorage.setItem("accessToken", newAccessToken);
 
-        // ✅ Retry the original request with the new token
-        error.config.headers.Authorization = `Bearer ${newAccessToken}`;
-        return API(error.config);
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        return API(originalRequest); //Retry once only
+
       } catch (err) {
         console.error("Refresh token expired, logging out...");
-        localStorage.removeItem("accessToken"); // ❌ Clear token
-        window.location.href = "/login"; // 🔄 Redirect to login
+        localStorage.removeItem("accessToken");
+        window.location.href = "/login";
       }
     }
-    return Promise.reject(error);
+
+    return Promise.reject(error); // Don't retry more than once
   }
 );
+
 
 export default API;

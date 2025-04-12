@@ -13,18 +13,22 @@ import {
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
-import { Trash2, Save } from "lucide-react";
+import { Trash2, Pencil} from "lucide-react";
 import { Country, State, City }  from 'country-state-city';
 import {fetchCustomerById,updateCustomer, deleteCustomer} from '../../../Redux/Slices/customerSlice'
+import {addAuditLog} from "../../../Redux/Slices/auditLogSlice"
+import Toast from "../../Shared_Module/Toast/Toast"
 import './CustomerDetails.css'
 
 const CustomerDetails = () => {
+
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const darkMode = useSelector((state) => state.theme.darkMode);
   const currentCustomer = useSelector((state) => state.customers.currentCustomer)
-       
+  const user = useSelector((state)=>state.auth.user)
+
   const [customer, setCustomer] = useState({
     name: "",
     phone: "",
@@ -40,11 +44,15 @@ const CustomerDetails = () => {
   const [states, setStates] = useState([]);
   const [cities,setCities] = useState([]);
   const [countryCode, setCountryCode] = useState();
+  const [toast, setToast] = useState({ open: false, message: "", type: "success" });
+
+  
+
+
 
   useEffect(() => {
     if (id) {
         dispatch(fetchCustomerById(id));
-        
     }
   }, [dispatch, id]);
 
@@ -86,7 +94,15 @@ const CustomerDetails = () => {
         state: customer.state.name, 
         country: customer.country.name 
       }  })).unwrap();
-      alert("Customer updated successfully");
+      dispatch(
+       addAuditLog({
+          user: user.name,
+          operation: "UPDATE",
+          module: "Customer",
+          message: `Updated Customer ${customer.name}`,
+        })
+      );
+      showToast("Updated customer successfully!", "success")
     } catch (error) {
       console.error("Error updating customer:", error);
     }
@@ -94,15 +110,29 @@ const CustomerDetails = () => {
   
 
   const handleDelete = async () => {
-    if (window.confirm("Are you sure you want to delete this customer?")) {
       try {
-        await dispatch(deleteCustomer(id)).unwrap();
-        alert("Customer deleted successfully");
-        navigate("/billing");
+        await dispatch(deleteCustomer(id)).unwrap()
+        dispatch(
+          addAuditLog({
+             user: user.name,
+             operation: "DELETE",
+             module: "Customer",
+             message: `Deleted Customer ${customer.name}`,
+           })
+         )
+         showToast("Deleted customer successfully!", "success")
+
+         setTimeout(()=>navigate("/billing"), 3000)
+         
+        
+        
       } catch (error) {
         console.error("Error deleting customer:", error);
       }
-    }
+    
+  };
+  const showToast = (msg, type) => {
+    setToast({ open: true, message: msg, type });
   };
   
 
@@ -399,8 +429,14 @@ const CustomerDetails = () => {
             >
               <Button
                 variant="contained"
-                color="primary"
-                startIcon={<Save size={18} />}
+                sx={{
+                  backgroundColor: "#28a745",
+                  color: "white",
+                  "&:hover": {
+                    backgroundColor: "#218838",
+                  },
+                }}
+                startIcon={<Pencil size={18} />}
                 onClick={handleUpdate}
               >
                 Update
@@ -417,6 +453,7 @@ const CustomerDetails = () => {
           
         </div>
       </motion.div>
+      <Toast open={toast.open} message={toast.message} type={toast.type} onClose={() => setToast({ ...toast, open: false })} />
     </div>
   );
 };

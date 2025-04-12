@@ -18,7 +18,6 @@ const authRoutes = require("./Route/auth")
 const invoiceEmailRoute = require("./Route/invoice")
 
 const authenticateUser = require("./Middleware/auth")
-const authorizeRoles = require("./Middleware/authorization")
 const customerRoutes = require("./Route/Customer")
 const billRoutes = require("./Route/Bill")
 const shopRoutes = require("./Route/Shop");
@@ -33,7 +32,7 @@ const passport = require("passport");
 require("./Middleware/passportConfig"); 
 
 // Middlewares
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(cors({origin: `${process.env.CLIENT_URL}`, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
@@ -63,11 +62,11 @@ app.use("/api/inventory-requests",authenticateUser,inventoryRequestRoutes)
 //     res.send("Hello! Rushit Soni");
 // });
 app.use("/api/upload", uploadRoutes);
-app.use("/api/audit-logs",authenticateUser,authorizeRoles("admin"),auditLogRoutes)
+app.use("/api/audit-logs",auditLogRoutes)
 
 
 
 
-app.listen(PORT,()=>{
-    console.log(`Server started at http://localhost:${PORT}`)
+app.listen(()=>{
+    console.log(`Server started at ${process.env.BACKEND_SERVER_URL}`)
 })

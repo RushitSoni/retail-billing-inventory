@@ -16,6 +16,7 @@ const addAuditLog = async (req, res) => {
     const newLog = await AuditLog.create(req.body);
     res.status(201).json({ log: newLog });
   } catch (error) {
+    console.log(error.message)
     res.status(500).json({ message: "Failed to add audit log" });
   }
 };

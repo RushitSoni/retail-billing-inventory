@@ -19,7 +19,7 @@ import {
   MenuItem,
   Grid,
   Button,
-  Typography,
+  // Typography,
   Dialog,
   DialogActions,
   DialogContent,
@@ -34,7 +34,8 @@ import {
   fetchInventoryByShopAndBranch,
 } from "../../Redux/Slices/inventorySlice";
 import "./Inventory.css";
-import Toast from "../Toast/Toast";
+import Toast from "../Shared_Module/Toast/Toast";
+import { addAuditLog } from "../../Redux/Slices/auditLogSlice";
 
 export default function Inventory() {
   const darkMode = useSelector((state) => state.theme.darkMode);
@@ -44,10 +45,7 @@ export default function Inventory() {
   const user = useSelector((state)=>state.auth.user)
   const [selectedShop, setSelectedShop] = useState("");
   const [selectedBranch, setSelectedBranch] = useState("");
-  // useEffect(() => {
-  //   console.log("Fetching inventory...");
-  //   dispatch(fetchInventory()); // Fetch inventory when component mounts
-  // }, [dispatch]);
+  
   useEffect(() => {
     if (selectedShop && selectedBranch) {
       dispatch(
@@ -58,7 +56,7 @@ export default function Inventory() {
       );
     }
   }, [selectedShop, selectedBranch, dispatch]);
-  // console.log("Redux State",Array.isArray(initialProducts))
+  
   useEffect(() => {
     setProducts(initialProducts);
   }, [initialProducts]);
@@ -67,8 +65,7 @@ export default function Inventory() {
    dispatch(fetchUserShops(user?._id))
   }, [dispatch,user]);
 
-  // Dummy Product Data
-  //const initialProducts = items;
+ 
   const [products, setProducts] = useState("");
   const [order, setOrder] = useState("asc"); // Sorting order
   const [orderBy, setOrderBy] = useState("name"); // Sorting column
@@ -89,11 +86,7 @@ export default function Inventory() {
   const handleSort = (property) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
-
-  
-      setOrderBy(property);
-  
-   
+    setOrderBy(property);
   };
 
   const sortedProducts = [...products].sort((a, b) => {
@@ -119,8 +112,23 @@ export default function Inventory() {
     setPage(0);
   };
 
+
+
   const handleDelete = async (id) => {
-    await dispatch(deleteInventory(id)); // Assuming you have a deleteInventory action
+    await dispatch(deleteInventory(id)).unwrap(); // Assuming you have a deleteInventory action
+
+    await dispatch(
+      addAuditLog({
+        user: user.name,
+        operation: "DELETE",
+        module: "Inventory",
+        message: `Deleted Inventory.`,
+      })
+    );
+
+    
+    showToast("Inventory item deleted successfully!", "success");
+
     if (selectedShop && selectedBranch) {
       dispatch(
         fetchInventoryByShopAndBranch({
@@ -147,12 +155,36 @@ export default function Inventory() {
 
     try {
       if (edit) {
-        console.log(editProduct._id, productData);
+        //console.log(editProduct._id, productData);
         await dispatch(
           updateInventory({ id: editProduct._id, updatedData: productData })
+        ).unwrap();
+
+        await dispatch(
+          addAuditLog({
+            user: user.name,
+            operation: "UPDATE",
+            module: "Inventory",
+            message: `Updated Inventory ${productData.name}.`,
+          })
         );
+    
+        
+        showToast("Inventory item updated successfully!", "success");
       } else {
-        await dispatch(addInventory(productData));
+        await dispatch(addInventory(productData)).unwrap();
+        
+        await dispatch(
+          addAuditLog({
+            user: user.name,
+            operation: "CREATE",
+            module: "Inventory",
+            message: `Added Inventory ${productData.name}.`,
+          })
+        );
+    
+        
+        showToast("Inventory item added successfully!", "success");
       }
 
       if (selectedShop && selectedBranch) {
@@ -166,7 +198,7 @@ export default function Inventory() {
       setOpenModal(false);
       setEditProduct(null);
       setEdit(0);
-      showToast("Logged in successfully!", "error")
+      
     } catch (error) {
       console.error("Error saving inventory item:", error);
     }
@@ -486,6 +518,7 @@ export default function Inventory() {
             margin="dense"
             name="price"
             type="number"
+            inputProps={{ min: 0 }}
             variant="filled"
             value={editProduct?.price || ""}
             className="input-field"
@@ -514,6 +547,7 @@ export default function Inventory() {
             margin="dense"
             name="stock"
             type="number"
+            inputProps={{ min: 0 }}
             variant="filled"
             value={editProduct?.stock || ""}
             className="input-field"
@@ -542,6 +576,7 @@ export default function Inventory() {
             margin="dense"
             name="cgst"
             type="number"
+            inputProps={{ min: 0 }}
             variant="filled"
             value={editProduct?.cgst || ""}
             className="input-field"
@@ -562,6 +597,7 @@ export default function Inventory() {
             <TextField
             fullWidth
             label="SGST(%)"
+            inputProps={{ min: 0 }}
             onChange={(e) =>
               setEditProduct({ ...editProduct, sgst: e.target.value })
             }
@@ -597,6 +633,7 @@ export default function Inventory() {
             required
             margin="dense"
             name="discount"
+            inputProps={{ min: 0 }}
             type="number"
             variant="filled"
             value={editProduct?.discount || ""}

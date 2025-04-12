@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import "./ForgotPassword.css";
 import {forgotPassword} from "../../../Redux/Slices/authSlice"
 import { useDispatch, useSelector } from "react-redux";
+import Toast from "../../Shared_Module/Toast/Toast"
+import { useNavigate } from "react-router-dom";
 
 
 export default function ForgotPassword() {
@@ -11,15 +13,33 @@ export default function ForgotPassword() {
     const darkMode = useSelector((state) => state.theme.darkMode);
     const [email, setEmail] = useState("");
 
-  
+    const navigate = useNavigate()
     const dispatch = useDispatch();
     const { message, error} = useSelector((state) => state.auth);
 
+    const [toast, setToast] = useState({ open: false, message: "", type: "success" });
+  
+    const showToast = (msg, type) => {
+      setToast({ open: true, message: msg, type });
+    };
+  
+   
+
   
   
-    const handleReset = (e) => {
-      e.preventDefault();
-      dispatch(forgotPassword(email));
+    const handleReset = async (e) => {
+      try{
+        e.preventDefault();
+        await dispatch(forgotPassword(email)).unwrap();
+
+
+        showToast("Reset password link sent to your registered email successfully!", "success")
+        
+      }
+      catch(err){
+        console.log(err)
+      }
+     
     };
   return (
     <div className={`forgot-password-container ${darkMode ? "dark-mode" : "light-mode"}`}>
@@ -67,7 +87,7 @@ export default function ForgotPassword() {
               Send Reset Link
             </Button>
             <Typography className="forgot-signup-link">
-              Remembered your password? <span>Login</span>
+              Remembered your password? <span onClick={()=> navigate("/login")}>Login</span>
             </Typography>
           </motion.div>
 
@@ -77,6 +97,8 @@ export default function ForgotPassword() {
         {error && <p style={{ color: "red" }}>{error}</p>}
       </Paper>
     </motion.div>
+    <Toast open={toast.open} message={toast.message} type={toast.type} onClose={() => setToast({ ...toast, open: false })} />
+
   </div>
   )
 }

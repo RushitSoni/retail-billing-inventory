@@ -18,10 +18,9 @@ const VerifyEmail = () => {
     const verifyEmail = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/api/auth/verify-email/${token}`
+          `${process.env.REACT_APP_API_BASE_URL}/api/auth/verify-email/${token}`
         );
-        console.log(response)
-
+        
         if (response.data && response.data.message) {
           setMessage(response.data.message);
         } else {

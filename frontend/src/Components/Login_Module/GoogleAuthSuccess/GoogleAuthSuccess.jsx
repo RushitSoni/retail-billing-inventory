@@ -6,8 +6,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { SquareArrowOutUpRight } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../../Redux/Slices/authSlice"; // Import action
-import {jwtDecode} from "jwt-decode";
-
+import { jwtDecode } from "jwt-decode";
+import { addAuditLog } from "../../../Redux/Slices/auditLogSlice";
 import "./GoogleAuthSuccess.css";
 
 const GoogleAuthSuccess = () => {
@@ -16,7 +16,7 @@ const GoogleAuthSuccess = () => {
   const navigate = useNavigate();
   const [, setAccessToken] = useState(null);
   const [, setRefreshToken] = useState(null);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   useEffect(() => {
     const access = searchParams.get("accessToken");
     const refresh = searchParams.get("refreshToken");
@@ -26,8 +26,6 @@ const GoogleAuthSuccess = () => {
       setRefreshToken(refresh);
       localStorage.setItem("accessToken", access);
       localStorage.setItem("refreshToken", refresh);
-
-     
     } else {
       // Redirect to login if tokens are missing
       navigate("/login");
@@ -35,15 +33,29 @@ const GoogleAuthSuccess = () => {
 
     try {
       const decoded = jwtDecode(searchParams.get("accessToken")); // ✅ Decode JWT Token
-      dispatch(setUser({ id: decoded.id, name: decoded.name, email: decoded.email,role: decoded.role })); // ✅ Update Redux User
+      dispatch(
+        setUser({
+          id: decoded.id,
+          name: decoded.name,
+          email: decoded.email,
+          role: decoded.role,
+        })
+      ); // ✅ Update Redux User
+      dispatch(
+        addAuditLog({
+          user: decoded.name,
+          operation: "LOGIN",
+          module: "Login",
+          message: `Logged in via google.`,
+        })
+      );
     } catch (error) {
       console.error("Invalid token:", error);
       navigate("/login"); // If decoding fails, redirect to login
     }
-  }, [dispatch,searchParams, navigate]);
+  }, [dispatch, searchParams, navigate]);
 
   const handleExplore = async () => {
-   
     navigate("/");
   };
 
@@ -74,7 +86,7 @@ const GoogleAuthSuccess = () => {
             className="explore-btn"
             onClick={handleExplore}
             sx={{
-                gap:"0.5rem"
+              gap: "0.5rem",
             }}
           >
             Explore <SquareArrowOutUpRight size={20} />

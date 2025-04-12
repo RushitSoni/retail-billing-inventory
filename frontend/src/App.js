@@ -1,10 +1,10 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import NavBar from './Components/NavBar/NavBar';
-import Footer from './Components/Footer/Footer';
-import Home from './Components/HomePage/Home';
-import AboutUs from './Components/AboutUs/AboutUs';
+import NavBar from './Components/Shared_Module/NavBar/NavBar';
+import Footer from './Components/Shared_Module/Footer/Footer';
+import Home from './Components/Shared_Module/HomePage/Home';
+import AboutUs from './Components/Shared_Module/AboutUs/AboutUs';
 import Login from './Components/Login_Module/Login/Login';
 import SignUp from './Components/Login_Module/SignUp/SignUp';
 import ForgotPassword from './Components/Login_Module/ForgotPassword/ForgotPassword';
@@ -13,16 +13,16 @@ import VerifyEmail from './Components/Login_Module/VerifyEmail/VerifyEmail';
 import GoogleAuthSuccess from './Components/Login_Module/GoogleAuthSuccess/GoogleAuthSuccess';
 import Bill from './Components/Billing_Module/Bill/Bill';
 import CustomerDetails from './Components/Billing_Module/CustomerDetails/CustomerDetails';
-import NewShop from './Components/Billing_Module/NewShop/NewShop.jsx'
-import Shops from './Components/Billing_Module/Shops/Shops.jsx'
-import ShopDetail from './Components/Billing_Module/ShopDetail/ShopDetail.jsx';
+import NewShop from './Components/Shop_Module/NewShop/NewShop.jsx'
+import Shops from './Components/Shop_Module/Shops/Shops.jsx'
+import ShopDetail from './Components/Shop_Module/ShopDetail/ShopDetail.jsx';
 import Inventory from './Components/Inventory_Module/Inventory.jsx';
-import BranchDetails from './Components/Billing_Module/BranchDetails/BranchDetails.jsx'
-import ShopAnalytics from './Components/Billing_Module/ShopAnalytics/ShopAnalytics.jsx';
-import Admin from './Components/Admin/Admin.jsx'
+import BranchDetails from './Components/Shop_Module/BranchDetails/BranchDetails.jsx'
+import ShopAnalytics from './Components/Shop_Module/ShopAnalytics/ShopAnalytics.jsx';
+import Admin from './Components/Admin_Module/Admin/Admin.jsx'
 import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute.jsx'
-import Unauthorized from './Components/Unauthorized/Unauthorized.jsx';
-import Profile from './Components/Profile/Profile.jsx';
+import Unauthorized from './Components/Shared_Module/Unauthorized/Unauthorized.jsx';
+import Profile from './Components/Shared_Module/Profile/Profile.jsx';
 
 const App = () => {
  
@@ -52,6 +52,7 @@ const App = () => {
           <Route path='/google-auth-success' element={<GoogleAuthSuccess/>}/>
 
 
+       
           <Route path="/billing" element={
             <ProtectedRoute allowedRoles={["admin", "user"]}>
               <Bill/>
