@@ -124,27 +124,35 @@ export default function BillingPage() {
   const handleChange = (e) => {
     setCustomer({ ...customer, [e.target.name]: e.target.value });
   };
-  const handleSubmit = () => {
-    const customerData = {
-      ...customer, // Keep all other fields unchanged
-      state: customer.state.name,
-      country: customer.country.name,
-      shopId: selectedShop._id,
-      branchId: selectedBranch._id,
-    };
-    dispatch(addCustomer(customerData)).then(() => {
-      dispatch(
-        addAuditLog({
-          user: user.name,
-          operation: "CREATE",
-          module: "Bill",
-          message: `Added new customer ${customerData.name} in Branch ${selectedBranch.name} of Shop ${selectedShop.name} .`,
-        })
-      );
+  const handleSubmit = async () => {
 
-      showToast("Customer added successfully!", "success");
-    });
-    handleClose();
+    try{
+      const customerData = {
+        ...customer, // Keep all other fields unchanged
+        state: customer.state.name,
+        country: customer.country.name,
+        shopId: selectedShop._id,
+        branchId: selectedBranch._id,
+      };
+      await dispatch(addCustomer(customerData)).then(() => {
+        dispatch(
+          addAuditLog({
+            user: user.name,
+            operation: "CREATE",
+            module: "Bill",
+            message: `Added new customer ${customerData.name} in Branch ${selectedBranch.name} of Shop ${selectedShop.name} .`,
+          })
+        );
+  
+        showToast("Customer added successfully!", "success");
+      });
+      handleClose();
+    }
+    catch(err){
+      showToast("Customer addition Failed!", "error")
+      console.log(err)
+    }
+    
   };
 
   const customers = list;
@@ -289,8 +297,10 @@ export default function BillingPage() {
           }
         : { enabled: false },
     };
-    console.log(billData);
-    dispatch(addBill(billData))
+
+
+    try{
+      dispatch(addBill(billData))
       .unwrap() // Waits for promise resolution and throws if rejected
       .then(() => {
         dispatch(
@@ -315,6 +325,12 @@ export default function BillingPage() {
       })
     );
     showToast("Bill Generated successfully!", "success");
+
+    }catch(err){
+      showToast("Bill Generation Failed!", "error")
+      console.log(err)
+    }
+    
 
     generateInvoice(
       selectedShop,
@@ -380,6 +396,7 @@ export default function BillingPage() {
                     setFilteredItems([]);
                   }}
                 >
+                  <MenuItem disabled>--Select--</MenuItem>
                   {shops.map((shop) => (
                     <MenuItem key={shop._id} value={shop}>
                       {shop.name}
@@ -422,6 +439,7 @@ export default function BillingPage() {
                   }}
                   disabled={!selectedShop} // Disable if no shop selected
                 >
+                  <MenuItem disabled>--Select--</MenuItem>
                   {selectedShop?.branches?.map((branch) => (
                     <MenuItem key={branch._id} value={branch}>
                       {branch.name}

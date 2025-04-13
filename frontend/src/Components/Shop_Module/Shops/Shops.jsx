@@ -11,7 +11,7 @@ const ShopDetails = () => {
   const user = useSelector((state)=>state.auth.user)
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { list: shops } = useSelector((state) => state.shops);
+  const { list: shops ,loading} = useSelector((state) => state.shops);
   
   useEffect(() => {
     dispatch(fetchUserShops(user._id));
@@ -38,7 +38,7 @@ const ShopDetails = () => {
           Add Shop
         </Button>
       </Box>
-
+      {loading ? <div>Shops Are Loading ...</div>:<></>}
       {shops.map((shop, shopIndex) => (
         <motion.div
           key={shopIndex}

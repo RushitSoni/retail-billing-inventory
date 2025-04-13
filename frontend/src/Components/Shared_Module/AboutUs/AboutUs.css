@@ -84,7 +84,7 @@
 
 .testimonial-scroll {
     display: flex;
-    overflow: auto;
+    overflow: auto !important;
     gap: 1.5rem;
     padding: 1rem;
     scrollbar-width: none;

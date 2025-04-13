@@ -46,8 +46,8 @@ export default function NavBar() {
           message: `${user.name} logged-out.`,
         })
       )
+      setTimeout(()=>navigate("/login"))
       showToast("Logged out successfully!", "success")  
-      setTimeout(()=>navigate("/login"),3000)
     } );
   };
 
@@ -92,7 +92,7 @@ export default function NavBar() {
             whileHover={{ scale: 1.1 }}
             onClick={() => handleMenuClick("/shops")}
           >
-            My Shop
+            My Shops
           </motion.li>
           <motion.li
             whileHover={{ scale: 1.1 }}

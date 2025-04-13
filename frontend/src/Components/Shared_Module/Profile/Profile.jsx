@@ -52,7 +52,8 @@ export default function Profile() {
       showToast("User name updated successfully!", "success")
     }
     catch(err){
-      console.log("Error during updating userName : ",err.message)
+      showToast("Updation Failed!", "error")
+      console.log("Error during updating userName : ",err)
     }
     
   };

@@ -37,6 +37,7 @@ export default function ForgotPassword() {
         
       }
       catch(err){
+        showToast("Issue in sending Reset password link to your registered email!", "error")
         console.log(err)
       }
      

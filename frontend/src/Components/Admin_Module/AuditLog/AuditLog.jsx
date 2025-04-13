@@ -67,17 +67,23 @@ export default function AuditLog() {
 
 
 
-  const handleRemoveLog = (id) => {
-    dispatch(deleteAuditLog(id)).then(()=>showToast("AuditLog deleted successfully!", "success")
-  );
-    dispatch(
-      addAuditLog({
-        user: user.name,
-        operation: "DELETE",
-        module: "Admin",
-        message: "Audit Log Deleted.",
-      })
-    );
+  const handleRemoveLog = async (id) => {
+    try{
+      await dispatch(deleteAuditLog(id)).then(()=>showToast("AuditLog deleted successfully!", "success"));
+      await dispatch(
+        addAuditLog({
+          user: user.name,
+          operation: "DELETE",
+          module: "Admin",
+          message: "Audit Log Deleted.",
+        })
+      );
+    }
+    catch(err){
+      showToast("AuditLog deletion Failed!", "error")
+      console.log(err)
+    }
+   
   };
 
   return (

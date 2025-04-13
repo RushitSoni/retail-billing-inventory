@@ -68,7 +68,9 @@ const ShopCreation = () => {
       });
     }
     catch(error){
-      console.log("Shop Creation Failed : ",error.message)
+      showToast("Shop creation Failed!", "error")
+
+      console.log("Shop Creation Failed : ",error)
     }
     
   };

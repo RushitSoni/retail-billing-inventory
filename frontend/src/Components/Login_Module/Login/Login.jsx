@@ -20,9 +20,9 @@ const Login = () => {
     type: "success",
   });
 
-  const showToast = (msg, type) => {
-    setToast({ open: true, message: msg, type });
-  };
+  // const showToast = (msg, type) => {
+  //   setToast({ open: true, message: msg, type });
+  // };
 
   const { error } = useSelector((state) => state.auth);
 
@@ -52,14 +52,14 @@ const Login = () => {
 
     
 
-      showToast("Logged in successfully!", "success");
-      setTimeout(() => navigate("/"), 3000);
+      
+      setTimeout(() => navigate("/"));
     } catch (err) {
       console.log("Login failed : ", err);
     }
   };
   const handleGLogin = () => {
-    window.open(`/api/auth/google/login`, "_self");
+    window.open(`${process.env.REACT_APP_API_BASE_URL}/api/auth/google/login`, "_self");
   };
   const navigate = useNavigate();
 

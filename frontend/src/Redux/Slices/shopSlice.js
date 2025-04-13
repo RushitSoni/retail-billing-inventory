@@ -63,6 +63,20 @@ export const fetchUserShops = createAsyncThunk("shops/fetchByUser", async (userI
     }
 });
 
+export const fetchOwnerAndManagerShops = createAsyncThunk(
+    "shops/fetchOwnerAndManagerShops",
+    async (userId, thunkAPI) => {
+      try {
+        const response = await API.get(`/api/shops/inventory-user/${userId}`);
+        return response.data;
+      } catch (error) {
+        return thunkAPI.rejectWithValue(
+          error.response?.data?.message || "Failed to fetch shops for owner or manager"
+        );
+      }
+    }
+  );
+  
 
 // ✅ Shop Slice
 const shopSlice = createSlice({
@@ -129,6 +143,18 @@ const shopSlice = createSlice({
                 state.list = action.payload;
             })
             .addCase(fetchUserShops.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            
+            .addCase(fetchOwnerAndManagerShops.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchOwnerAndManagerShops.fulfilled, (state, action) => {
+                state.loading = false;
+                state.list = action.payload;
+            })
+            .addCase(fetchOwnerAndManagerShops.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });

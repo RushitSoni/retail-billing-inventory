@@ -104,6 +104,7 @@ const CustomerDetails = () => {
       );
       showToast("Updated customer successfully!", "success")
     } catch (error) {
+      showToast("Updation Failed!", "error")
       console.error("Error updating customer:", error);
     }
   };
@@ -127,6 +128,7 @@ const CustomerDetails = () => {
         
         
       } catch (error) {
+        showToast("Deletion Failed!", "error")
         console.error("Error deleting customer:", error);
       }
     

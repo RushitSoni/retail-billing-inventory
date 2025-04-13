@@ -26,7 +26,7 @@ import {
   DialogTitle,
 } from "@mui/material";
 import { Edit, XSquare, Plus } from "lucide-react";
-import { fetchUserShops } from "../../Redux/Slices/shopSlice";
+import { fetchOwnerAndManagerShops } from "../../Redux/Slices/shopSlice";
 import {
   addInventory,
   updateInventory,
@@ -62,7 +62,7 @@ export default function Inventory() {
   }, [initialProducts]);
 
   useEffect(() => {
-   dispatch(fetchUserShops(user?._id))
+   dispatch(fetchOwnerAndManagerShops(user?._id))
   }, [dispatch,user]);
 
  
@@ -115,28 +115,38 @@ export default function Inventory() {
 
 
   const handleDelete = async (id) => {
-    await dispatch(deleteInventory(id)).unwrap(); // Assuming you have a deleteInventory action
 
-    await dispatch(
-      addAuditLog({
-        user: user.name,
-        operation: "DELETE",
-        module: "Inventory",
-        message: `Deleted Inventory.`,
-      })
-    );
+    try{ await dispatch(deleteInventory(id)).unwrap(); // Assuming you have a deleteInventory action
 
-    
-    showToast("Inventory item deleted successfully!", "success");
-
-    if (selectedShop && selectedBranch) {
-      dispatch(
-        fetchInventoryByShopAndBranch({
-          shopId: selectedShop._id,
-          branchId: selectedBranch._id,
+      await dispatch(
+        addAuditLog({
+          user: user.name,
+          operation: "DELETE",
+          module: "Inventory",
+          message: `Deleted Inventory.`,
         })
       );
+  
+      
+      showToast("Inventory item deleted successfully!", "success");
+
+      if (selectedShop && selectedBranch) {
+        dispatch(
+          fetchInventoryByShopAndBranch({
+            shopId: selectedShop._id,
+            branchId: selectedBranch._id,
+          })
+        );
+      }
+
     }
+    catch(err){
+      showToast("Deletion Failed!", "error")
+      console.log(err)
+    }
+   
+
+   
   };
 
   const handleAddOrEdit = async (e) => {
@@ -156,35 +166,52 @@ export default function Inventory() {
     try {
       if (edit) {
         //console.log(editProduct._id, productData);
-        await dispatch(
-          updateInventory({ id: editProduct._id, updatedData: productData })
-        ).unwrap();
 
-        await dispatch(
-          addAuditLog({
-            user: user.name,
-            operation: "UPDATE",
-            module: "Inventory",
-            message: `Updated Inventory ${productData.name}.`,
-          })
-        );
-    
-        
-        showToast("Inventory item updated successfully!", "success");
+        try{
+          await dispatch(
+            updateInventory({ id: editProduct._id, updatedData: productData })
+          ).unwrap();
+  
+          await dispatch(
+            addAuditLog({
+              user: user.name,
+              operation: "UPDATE",
+              module: "Inventory",
+              message: `Updated Inventory ${productData.name}.`,
+            })
+          );
+      
+          
+          showToast("Inventory item updated successfully!", "success");
+
+        }
+        catch(err){
+          showToast("Updation Failed!", "error")
+          console.log(err)
+        }
+       
       } else {
-        await dispatch(addInventory(productData)).unwrap();
+
+        try{
+          await dispatch(addInventory(productData)).unwrap();
         
-        await dispatch(
-          addAuditLog({
-            user: user.name,
-            operation: "CREATE",
-            module: "Inventory",
-            message: `Added Inventory ${productData.name}.`,
-          })
-        );
-    
-        
-        showToast("Inventory item added successfully!", "success");
+          await dispatch(
+            addAuditLog({
+              user: user.name,
+              operation: "CREATE",
+              module: "Inventory",
+              message: `Added Inventory ${productData.name}.`,
+            })
+          );
+      
+          
+          showToast("Inventory item added successfully!", "success");
+        }
+        catch(err){
+          showToast("Addition Failed!", "error")
+          console.log(err)
+        }
+       
       }
 
       if (selectedShop && selectedBranch) {
@@ -251,6 +278,7 @@ export default function Inventory() {
                     setSelectedBranch(""); // Reset branch when shop changes
                   }}
                 >
+                  <MenuItem disabled>--Select--</MenuItem>
                   {shops.map((shop) => (
                     <MenuItem key={shop._id} value={shop}>
                       {shop.name}
@@ -288,6 +316,7 @@ export default function Inventory() {
                   }}
                   disabled={!selectedShop} // Disable if no shop selected
                 >
+                  <MenuItem disabled>--Select--</MenuItem>
                   {selectedShop?.branches?.map((branch) => (
                     <MenuItem key={branch._id} value={branch}>
                       {branch.name}

@@ -91,22 +91,33 @@ export default function BillList() {
   };
 
   const handleDelete = async (id) => {
-    await dispatch(deleteBill(id)).unwrap(); // Assuming you have a deleteInventory action
 
-    await dispatch(
-          addAuditLog({
-            user: user.name,
-            operation: "DELETE",
-            module: "Shop",
-            message: `Deleted Bill.`,
-          })
-        );
-    
-        
-    showToast("Bill deleted successfully!", "success");
+    try{
+      await dispatch(deleteBill(id)).unwrap(); // Assuming you have a deleteInventory action
 
-    dispatch(fetchBills());
+      await dispatch(
+            addAuditLog({
+              user: user.name,
+              operation: "DELETE",
+              module: "Shop",
+              message: `Deleted Bill.`,
+            })
+          );
+      
+          
+      showToast("Bill deleted successfully!", "success");
+  
+      dispatch(fetchBills());
+    }
+    catch(err){
+      showToast("Deletion Failed!", "error")
+      console.log(err)
+    }
+
+   
   };
+
+
   const toggleRow = (id) => {
     setOpenRows((prev) => ({ ...prev, [id]: !prev[id] }));
   };

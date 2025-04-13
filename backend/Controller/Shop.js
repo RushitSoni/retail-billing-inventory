@@ -176,3 +176,54 @@ exports.getUserShops = async (req, res) => {
       res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+
+
+exports.getShopsForOwnerAndManager = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    // Fetch shops where the user is an owner (Include all branches)
+    const ownerShops = await Shop.find({ owner: userId })
+      .populate("owner")
+      .populate("branches.managerId")
+      .populate("branches");
+
+    // Fetch shops where the user is a manager (Include only the managed branch)
+    const managerShops = await Shop.find({ "branches.managerId": userId })
+      .populate("owner")
+      .populate("branches.managerId");
+
+    const filteredManagerShops = managerShops.map(shop => ({
+      ...shop.toObject(),
+      branches: shop.branches?.filter(
+        branch => branch.managerId?._id.toString() === userId
+      ),
+    }));
+
+    // Merge owner and manager results, avoiding duplicate shop entries
+    const shopMap = new Map();
+
+    [...ownerShops, ...filteredManagerShops].forEach(shop => {
+      if (!shopMap.has(shop._id.toString())) {
+        shopMap.set(shop._id.toString(), shop);
+      } else {
+        // Merge branches if shop exists in both owner and manager results
+        const existingShop = shopMap.get(shop._id.toString());
+        existingShop.branches = [
+          ...new Map(
+            [...existingShop.branches, ...shop.branches].map(b => [
+              b._id.toString(),
+              b,
+            ])
+          ).values(),
+        ];
+      }
+    });
+
+    res.json(Array.from(shopMap.values()));
+  } catch (error) {
+    console.log("Error fetching shops:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};

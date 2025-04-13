@@ -4,6 +4,7 @@ const shopController = require("../Controller/Shop");
 
 router.post("/", shopController.createShop);
 router.get("/user/:userId", shopController.getUserShops);
+router.get("/inventory-user/:userId", shopController.getShopsForOwnerAndManager);
 router.get("/", shopController.getAllShops);
 router.get("/:id", shopController.getShopById);
 router.put("/:id", shopController.updateShop);

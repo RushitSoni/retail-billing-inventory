@@ -45,6 +45,7 @@ export default function ResetPassword() {
         showToast("Password Reset successfully!", "success")
       }
       catch(err){
+        showToast("Updation Failed!", "error")
         console.log(err)
       }
 

@@ -24,7 +24,7 @@ export default function TabsComponent() {
   const darkMode = useSelector((state) => state.theme.darkMode);
   const dispatch = useDispatch();
   const shop = useSelector((state) => state.shops.currentShop);
-  const [selectedTab, setSelectedTab] = useState(4);
+  const [selectedTab, setSelectedTab] = useState(0);
 
   const { shopId, branchId } = useParams();
 

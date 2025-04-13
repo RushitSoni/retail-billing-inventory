@@ -170,7 +170,8 @@ export default function Staff() {
 
     }
     catch(error){
-      console.log("Staff not added : ",error.message)
+      showToast("Addition Failed!", "error")
+      console.log("Staff not added : ",error)
     }
     
   };
@@ -216,7 +217,8 @@ export default function Staff() {
 
     }
     catch(error){
-      console.log("Error During Staff Deletion : ",error.message)
+      showToast("Deletion Failed!", "error")
+      console.log("Error During Staff Deletion : ",error)
     }
     
   };

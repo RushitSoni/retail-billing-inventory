@@ -178,7 +178,8 @@ const ShopDetail = () => {
 
       showToast("Shop updated successfully!", "success");
     } catch (error) {
-      console.log("Shop updation failed : ", error.message);
+      showToast("Updation Failed!", "error")
+      console.log("Shop updation failed : ", error);
     }
   };
 
@@ -199,7 +200,8 @@ const ShopDetail = () => {
 
       setTimeout(() => navigate("/shops"), 3000);
     } catch (error) {
-      console.log("Shop updation failed : ", error.message);
+      showToast("Deletion Failed!", "error")
+      console.log("Shop updation failed : ", error);
     }
   };
 

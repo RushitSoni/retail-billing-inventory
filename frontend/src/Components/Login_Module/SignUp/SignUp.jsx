@@ -46,6 +46,7 @@ export default function SignUp() {
 
       showToast("User registered successfully!  ,please verify your email to login.", "success");
     } catch (err) {
+      showToast("Registration Failed!", "error")
       console.log(err);
     }
   };
