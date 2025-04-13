@@ -38,8 +38,7 @@ const ShopDetails = () => {
           Add Shop
         </Button>
       </Box>
-      {loading ? <div>Shops Are Loading ...</div>:<></>}
-      {shops.map((shop, shopIndex) => (
+      {shops.length>0 ? <>{shops.map((shop, shopIndex) => (
         <motion.div
           key={shopIndex}
           initial={{ opacity: 0, y: -2 }}
@@ -107,7 +106,8 @@ const ShopDetails = () => {
             <div></div>
           )}
         </motion.div>
-      ))}
+      ))}</>: <></>}
+      
      </div>
     </div>
   );

@@ -56,17 +56,24 @@ export default function Inventory() {
       );
     }
   }, [selectedShop, selectedBranch, dispatch]);
+
   
   useEffect(() => {
-    setProducts(initialProducts);
-  }, [initialProducts]);
+    if(selectedShop && selectedBranch){
+      setProducts(initialProducts);
+    }
+    else{
+      setProducts([])
+    }
+    
+  }, [selectedShop, selectedBranch,initialProducts]);
 
   useEffect(() => {
    dispatch(fetchOwnerAndManagerShops(user?._id))
   }, [dispatch,user]);
 
  
-  const [products, setProducts] = useState("");
+  const [products, setProducts] = useState([]);
   const [order, setOrder] = useState("asc"); // Sorting order
   const [orderBy, setOrderBy] = useState("name"); // Sorting column
   const [page, setPage] = useState(0); // Pagination page
