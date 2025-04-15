@@ -24,9 +24,9 @@ export default function Customers() {
   const darkMode = useSelector((state) => state.theme.darkMode);
   const dispatch = useDispatch();
   const { shopId, branchId } = useParams();
-  const customers = useSelector((state)=>state.customers.list)
+  const fetchedCustomers = useSelector((state)=>state.customers.list)
   const navigate = useNavigate()
-
+  const [customers,setCustomers] = useState([])
   const [order, setOrder] = useState("asc"); // Sorting order
   const [orderBy, setOrderBy] = useState("name"); // Sorting column
   const [page, setPage] = useState(0); // Pagination page
@@ -38,6 +38,10 @@ export default function Customers() {
   useEffect(() => {
     dispatch(fetchCustomerByShopAndBranch({shopId,branchId}));
   }, [dispatch,shopId,branchId]);
+
+  useEffect(() => {
+    setCustomers(fetchedCustomers)
+  }, [fetchedCustomers]);
 
   // Sorting logic
   const handleSort = (property) => {

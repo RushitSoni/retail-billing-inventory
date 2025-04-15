@@ -119,14 +119,28 @@ export default function BillingPage() {
     }
     setOpen(true);
   };
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    setCustomer({
+      name: "",
+      phone: "",
+      email: "",
+      address: "",
+      city: "",
+      state: "",
+      country: "",
+      pincode: "",
+      biller: user._id,
+      shopId: "",
+      branchId: "",
+    });
+  };
 
   const handleChange = (e) => {
     setCustomer({ ...customer, [e.target.name]: e.target.value });
   };
   const handleSubmit = async () => {
-
-    try{
+    try {
       const customerData = {
         ...customer, // Keep all other fields unchanged
         state: customer.state.name,
@@ -143,16 +157,28 @@ export default function BillingPage() {
             message: `Added new customer ${customerData.name} in Branch ${selectedBranch.name} of Shop ${selectedShop.name} .`,
           })
         );
-  
+
         showToast("Customer added successfully!", "success");
+
+        setCustomer({
+          name: "",
+          phone: "",
+          email: "",
+          address: "",
+          city: "",
+          state: "",
+          country: "",
+          pincode: "",
+          biller: user._id,
+          shopId: "",
+          branchId: "",
+        });
       });
       handleClose();
+    } catch (err) {
+      showToast("Customer addition Failed!", "error");
+      console.log(err);
     }
-    catch(err){
-      showToast("Customer addition Failed!", "error")
-      console.log(err)
-    }
-    
   };
 
   const customers = list;
@@ -190,7 +216,6 @@ export default function BillingPage() {
   };
 
   const addItemToBill = (item) => {
-
     const alreadyAdded = selectedItems.some((i) => i._id === item._id);
 
     if (alreadyAdded) {
@@ -298,39 +323,36 @@ export default function BillingPage() {
         : { enabled: false },
     };
 
-
-    try{
+    try {
       dispatch(addBill(billData))
-      .unwrap() // Waits for promise resolution and throws if rejected
-      .then(() => {
-        dispatch(
-          reduceInventoryStock({
-            items: selectedItems.map((item) => ({
-              id: item._id,
-              quantity: item.quantity,
-            })),
-          })
-        );
-      })
-      .catch((error) => {
-        console.error("Failed to add bill:", error);
-      });
+        .unwrap() // Waits for promise resolution and throws if rejected
+        .then(() => {
+          dispatch(
+            reduceInventoryStock({
+              items: selectedItems.map((item) => ({
+                id: item._id,
+                quantity: item.quantity,
+              })),
+            })
+          );
+        })
+        .catch((error) => {
+          console.error("Failed to add bill:", error);
+        });
 
-    dispatch(
-      addAuditLog({
-        user: user.name,
-        operation: "CREATE",
-        module: "Bill",
-        message: `Added new Bill for Branch ${selectedBranch.name} of Shop ${selectedShop.name}.`,
-      })
-    );
-    showToast("Bill Generated successfully!", "success");
-
-    }catch(err){
-      showToast("Bill Generation Failed!", "error")
-      console.log(err)
+      dispatch(
+        addAuditLog({
+          user: user.name,
+          operation: "CREATE",
+          module: "Bill",
+          message: `Added new Bill for Branch ${selectedBranch.name} of Shop ${selectedShop.name}.`,
+        })
+      );
+      showToast("Bill Generated successfully!", "success");
+    } catch (err) {
+      showToast("Bill Generation Failed!", "error");
+      console.log(err);
     }
-    
 
     generateInvoice(
       selectedShop,
@@ -391,7 +413,7 @@ export default function BillingPage() {
                     setSelectedBranch(""); // Reset branch when shop changes
                     setSelectedItems([]);
                     setCustomerDetails(null);
-                    setSearchTerm("")
+                    setSearchTerm("");
                     setItemSearch("");
                     setFilteredItems([]);
                   }}
@@ -433,7 +455,7 @@ export default function BillingPage() {
                     setSelectedBranch(e.target.value);
                     setSelectedItems([]);
                     setCustomerDetails(null);
-                    setSearchTerm("")
+                    setSearchTerm("");
                     setItemSearch("");
                     setFilteredItems([]);
                   }}
@@ -819,8 +841,15 @@ export default function BillingPage() {
           {filteredCustomers.length > 0 && (
             <ul className="suggestions-list">
               {filteredCustomers.map((customer, index) => (
-                <li key={index} onClick={() => {selectCustomer(customer);setSelectedItems([]);setItemSearch("");
-                  setFilteredItems([]);}}>
+                <li
+                  key={index}
+                  onClick={() => {
+                    selectCustomer(customer);
+                    setSelectedItems([]);
+                    setItemSearch("");
+                    setFilteredItems([]);
+                  }}
+                >
                   {customer.name}
                 </li>
               ))}

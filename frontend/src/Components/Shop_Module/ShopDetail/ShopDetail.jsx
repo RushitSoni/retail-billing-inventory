@@ -130,7 +130,18 @@ const ShopDetail = () => {
   }, [shop.branches, states]); // Runs when shop branches or states change
 
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    setBranch({
+      name: "",
+      address: "",
+      country: null,
+      state: null,
+      city: "",
+      pincode: "",
+      managerId: "",
+    });
+  };
 
   const handleChange = (e) => {
     setShop({ ...shop, [e.target.name]: e.target.value });
@@ -154,7 +165,6 @@ const ShopDetail = () => {
       const data = await response.json();
       if (data.imageUrl) {
         setShop({ ...shop, logo: data.imageUrl });
-        
       } else {
         alert("Image upload failed");
       }
@@ -177,8 +187,18 @@ const ShopDetail = () => {
       );
 
       showToast("Shop updated successfully!", "success");
+
+      setBranch({
+        name: "",
+        address: "",
+        country: null,
+        state: null,
+        city: "",
+        pincode: "",
+        managerId: "",
+      });
     } catch (error) {
-      showToast("Updation Failed!", "error")
+      showToast("Updation Failed!", "error");
       console.log("Shop updation failed : ", error);
     }
   };
@@ -200,7 +220,7 @@ const ShopDetail = () => {
 
       setTimeout(() => navigate("/shops"), 3000);
     } catch (error) {
-      showToast("Deletion Failed!", "error")
+      showToast("Deletion Failed!", "error");
       console.log("Shop updation failed : ", error);
     }
   };
