@@ -341,7 +341,7 @@ const BranchCharts = (props) => {
       {props.branchId === "all" ? (
         <div className="chart-container">
           <h2>Branch Wise Sales Data</h2>
-          {shopBranchData.length > 0 ? (
+          {shopBranchData  ? (
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={shopBranchData?.data}>
                 <CartesianGrid strokeDasharray="3 3" />
