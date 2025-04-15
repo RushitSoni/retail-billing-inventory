@@ -11,7 +11,7 @@ const ShopDetails = () => {
   const user = useSelector((state)=>state.auth.user)
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { list: shops ,loading} = useSelector((state) => state.shops);
+  const { list: shops } = useSelector((state) => state.shops);
   
   useEffect(() => {
     dispatch(fetchUserShops(user._id));

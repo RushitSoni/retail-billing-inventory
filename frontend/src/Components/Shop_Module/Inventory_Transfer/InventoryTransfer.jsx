@@ -539,19 +539,28 @@ export default function InventoryTransfer() {
                             <td>
                               <input
                                 type="number"
-                                max={Math.min(
-                                  item.requestedQuantity,
-                                  availableStock
-                                )}
                                 value={item.approvedQuantity}
                                 disabled={!isAvailable || isUpdated}
-                                onChange={(e) =>
+                                onChange={(e) => {
+                                  const inputVal = Number(e.target.value);
+                                  const maxVal = Math.min(
+                                    item.requestedQuantity,
+                                    availableStock
+                                  );
+
+                                  // Clamp value to max allowed
+                                  const finalVal =
+                                    inputVal > maxVal
+                                      ? maxVal
+                                      : inputVal < 0
+                                      ? 0
+                                      : inputVal;
                                   handleApprovedQuantityChange(
                                     req._id,
                                     item.inventoryId.name,
-                                    e.target.value
-                                  )
-                                }
+                                    finalVal
+                                  );
+                                }}
                                 style={{ width: "50px" }}
                               />
                             </td>
