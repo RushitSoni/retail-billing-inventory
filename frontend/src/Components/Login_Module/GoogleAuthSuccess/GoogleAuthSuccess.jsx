@@ -33,6 +33,7 @@ const GoogleAuthSuccess = () => {
 
     try {
       const decoded = jwtDecode(searchParams.get("accessToken")); // ✅ Decode JWT Token
+      console.log(decoded)
       dispatch(
         setUser({
           id: decoded.id,

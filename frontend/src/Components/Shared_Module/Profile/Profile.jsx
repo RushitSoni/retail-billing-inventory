@@ -111,12 +111,10 @@ export default function Profile() {
         <div className="profile-row">
           <TextField
             label="Email"
-            value={selectedUser.email}
+            value={selectedUser?.email}
             disabled
             fullWidth
             margin="dense"
-            name="name"
-            type="text"
             variant="filled"
             className="input-field"
             sx={textFieldStyle}

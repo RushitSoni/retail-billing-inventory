@@ -134,7 +134,8 @@ export default function NavBar() {
                 <>
                   <li
                     onClick={() => {
-                      navigate(`/user-profile/${user._id}`);
+                      console.log(user)
+                      navigate(`/user-profile/${user._id || user.id}`);
                       setDropdownOpen(false);
                     }}
                   >

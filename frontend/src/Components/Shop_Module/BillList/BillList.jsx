@@ -16,10 +16,11 @@ import {
   Box,
 } from "@mui/material";
 import { XSquare, ChevronDown, ChevronUp } from "lucide-react";
-import { fetchBills, deleteBill } from "../../../Redux/Slices/billSlice";
+import { fetchBills, deleteBill, fetchBillsByShopAndBranch } from "../../../Redux/Slices/billSlice";
 import "./BillList.css";
 import { addAuditLog } from "../../../Redux/Slices/auditLogSlice";
 import Toast from "../../Shared_Module/Toast/Toast"
+import { useParams } from "react-router-dom";
 
 export default function BillList() {
 
@@ -28,14 +29,15 @@ export default function BillList() {
   const dispatch = useDispatch();
   const initialBills = useSelector((state) => state.bills.list);
   const [toast, setToast] = useState({ open: false, message: "", type: "success" });
+  const {shopId,branchId} = useParams()
 
   const showToast = (msg, type) => {
     setToast({ open: true, message: msg, type });
   };
   
   useEffect(() => {
-    dispatch(fetchBills());
-  }, [dispatch]);
+    dispatch(fetchBillsByShopAndBranch({shopId,branchId}));
+  }, [dispatch,shopId,branchId]);
 
   useEffect(() => {
     setBills(initialBills);
