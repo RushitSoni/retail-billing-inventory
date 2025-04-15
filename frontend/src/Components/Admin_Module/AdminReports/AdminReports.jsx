@@ -26,7 +26,7 @@ const AdminReports = () => {
       shop.branches.forEach((branch) => {
         formattedShopData.push({
           "Shop Name": shop.name,
-          Owner: shop.owner?.name,
+          Owner: shop.owner?.name ||"N/A",
           Category: shop.category,
           Logo: shop.logo,
           Description: shop.description,
@@ -40,7 +40,7 @@ const AdminReports = () => {
       // If no branches, push only shop details
       formattedShopData.push({
         "Shop Name": shop.name,
-        "Owner ID": shop.owner,
+        "Owner ID": shop.owner?.name || "N/A",
         Category: shop.category,
         Logo: shop.logo,
         Description: shop.description,

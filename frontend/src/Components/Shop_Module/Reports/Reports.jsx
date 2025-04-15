@@ -3,8 +3,8 @@ import "./Reports.css";
 import { Download } from "lucide-react";
 import { generateExcelReport } from "../../../utils/excelReport";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCustomers } from "../../../Redux/Slices/customerSlice";
-import { fetchBills } from "../../../Redux/Slices/billSlice";
+import { fetchCustomerByShopAndBranch } from "../../../Redux/Slices/customerSlice";
+import { fetchBillsByShopAndBranch } from "../../../Redux/Slices/billSlice";
 import { fetchInventoryByShopAndBranch } from "../../../Redux/Slices/inventorySlice";
 import { addAuditLog } from "../../../Redux/Slices/auditLogSlice";
 
@@ -14,10 +14,10 @@ const Reports = ({ shopId, branchId, branchName }) => {
   const inventory = useSelector((state) => state.inventory.list);
   const customers = useSelector((state) => state.customers.list);
   const user = useSelector((state)=>state.auth.user)
-
+console.log(inventory)
   useEffect(() => {
-    dispatch(fetchCustomers());
-    dispatch(fetchBills());
+    dispatch(fetchCustomerByShopAndBranch({ shopId, branchId}));
+    dispatch(fetchBillsByShopAndBranch({ shopId, branchId}));
 
     if (shopId && branchId) {
       dispatch(fetchInventoryByShopAndBranch({ shopId, branchId }));
@@ -78,8 +78,8 @@ const Reports = ({ shopId, branchId, branchName }) => {
     "CGST (%)": item.cgst,
     "SGST (%)": item.sgst,
     "Discount (%)": item.discount,
-    "Shop ID": item.shopId,
-    "Branch ID": item.branchId,
+    "Shop ID": item.shopId.name,
+    "Branch ID": branchName,
     "Created At": item.createdAt
       ? new Date(item.createdAt).toLocaleDateString()
       : "N/A",

@@ -75,7 +75,7 @@ exports.getInventoryByShopAndBranch = async (req, res) => {
       if (shopId) filter.shopId = shopId;
       if (branchId) filter.branchId = branchId;
 
-      const inventory = await Inventory.find(filter);
+      const inventory = await Inventory.find(filter).populate("shopId");
       res.status(200).json(inventory);
   } catch (error) {
       res.status(500).json({ message: "Failed to fetch inventory by shop and branch", error: error.message });
