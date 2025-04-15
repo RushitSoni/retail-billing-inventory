@@ -38,9 +38,9 @@ export default function Footer() {
           <h3>Quick Links</h3>
           
             <a href="/">Home</a>
-            <a href="/">About Us</a>
-            <a href="/">Billing</a>
-            <a href="/">Inventory</a>
+            <a href="/aboutUS">About Us</a>
+            <a href="/billing">Billing</a>
+            <a href="/inventory">Inventory</a>
 
          
           
