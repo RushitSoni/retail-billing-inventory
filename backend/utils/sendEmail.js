@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-const sendEmail = async (to, subject, htmlContent,attachmentPath) => {
+const sendEmail = async (to, subject, htmlContent,attachmentPath= null) => {
   try {
     const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
@@ -12,22 +12,25 @@ const sendEmail = async (to, subject, htmlContent,attachmentPath) => {
     });
 
    
-
-    await transporter.sendMail({
+    const mailOptions = {
       from: process.env.SMTP_FROM,
       to,
       subject,
       html: htmlContent,
-      attachments: [
-        {
-            filename: "invoice.pdf",
-            path: attachmentPath,
-            contentType: "application/pdf",
-        },
-    ],
-    });
+    };
 
-    console.log(`Email sent to: ${to}`);
+    if (attachmentPath) {
+      mailOptions.attachments = [
+        {
+          filename: "invoice.pdf",
+          path: attachmentPath,
+          contentType: "application/pdf",
+        },
+      ];
+    }
+
+    await transporter.sendMail(mailOptions);
+
   } catch (error) {
     console.error("Email sending error:", error);
   }

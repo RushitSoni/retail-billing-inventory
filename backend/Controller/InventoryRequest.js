@@ -1,7 +1,8 @@
 const InventoryRequest = require("../Model/InventoryRequest");
 const Inventory = require("../Model/Inventory")
 const mongoose = require('mongoose')
-// ✅ Create a new inventory transfer request
+
+// Create a new inventory transfer request
 exports.createInventoryRequest = async (req, res) => {
   try {
     const request = await InventoryRequest.create(req.body);
@@ -12,7 +13,7 @@ exports.createInventoryRequest = async (req, res) => {
   }
 };
 
-// ✅ Get all requests for a specific shop
+//  Get all requests for a specific shop
 exports.getRequestsByShop = async (req, res) => {
   try {
     const { shopId } = req.params;
@@ -24,7 +25,7 @@ exports.getRequestsByShop = async (req, res) => {
   }
 };
 
-// ✅ Update request status (Approve, Reject, Partially Accept)
+// Update request status (Approve, Reject, Partially Accept)
 exports.updateRequestStatus = async (req, res) => {
   try {
     const { id } = req.params;

@@ -12,17 +12,17 @@ passport.use(
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
             callbackURL: `${process.env.BACKEND_SERVER_URL}/api/auth/google/callback`,
-            passReqToCallback: true, // ✅ Allows access to req object
+            passReqToCallback: true, //  Allows access to req object
         },
         async (req, accessToken, refreshToken, profile, done) => {
             try {
-                const isSignup = req.session.isSignup; // ✅ Check if request is for signup
+                const isSignup = req.session.isSignup; //  Check if request is for signup
 
                 let user = await User.findOne({ email: profile.emails[0].value });
 
                 if (user) {
                     if (isSignup) {
-                        // ❌ User exists but trying to sign up → Throw error
+                        //  User exists but trying to sign up → Throw error
                         return done(null, false);
                     }
 
@@ -32,16 +32,16 @@ passport.use(
                     }
 
 
-                    // ✅ User exists & trying to log in → Allow login
+                    //  User exists & trying to log in → Allow login
                     return done(null, user);
                 }
 
                 if (!isSignup) {
-                    // ❌ User does NOT exist but trying to log in → Throw error
+                    //  User does NOT exist but trying to log in → Throw error
                     return done(null, false);
                 }
 
-                // ✅ New user signing up → Create user
+                //  New user signing up → Create user
                 const newUser = new User({
                     googleId: profile.id,
                     name: profile.displayName,

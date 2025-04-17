@@ -15,7 +15,9 @@ const CLIENT_URL = process.env.CLIENT_URL;
 const REFRESH_SECRET = process.env.REFRESH_SECRET;
 const JWT_SECRET = process.env.JWT_SECRET;
 const ACCESS_SECRET = process.env.JWT_SECRET;
-// ✅ User Login Route
+
+
+// User Login Route
 router.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -35,17 +37,17 @@ router.post("/login", async (req, res) => {
             });
         }
 
-        // ✅ Compare Password
+        // Compare Password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ message: "Invalid Credentials!" });
 
-        // ✅ Generate Access Token (15 min expiry)
+        // Generate Access Token (15 min expiry)
         const accessToken = jwt.sign({ id: user._id,role:user.role,name:user.name}, ACCESS_SECRET, { expiresIn: "15m" });
 
-        // ✅ Generate Refresh Token (7 days expiry)
+        // Generate Refresh Token (7 days expiry)
         const refreshToken = jwt.sign({ id: user._id }, REFRESH_SECRET, { expiresIn: "7d" });
 
-        // ✅ Store Refresh Token in HTTPOnly Cookie
+        // Store Refresh Token in HTTPOnly Cookie
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
             secure: true,
@@ -63,7 +65,7 @@ router.post("/login", async (req, res) => {
     }
 });
 
-// ✅ Refresh Token Route (Generate New Access Token)
+//  Refresh Token Route (Generate New Access Token)
 router.post("/refresh", (req, res) => {
     const refreshToken = req.cookies.refreshToken; // Get from Cookie
 
@@ -220,19 +222,19 @@ router.get("/verify-email/:token", async (req, res) => {
   }
 });
 
-// ✅ Google Signup Route → Only allows new user creation
+// Google Signup Route → Only allows new user creation
 router.get("/google/signup", (req, res, next) => {
-    req.session.isSignup = true; // ✅ Allow new user creation
+    req.session.isSignup = true; //  Allow new user creation
     passport.authenticate("google", { scope: ["profile", "email"] })(req, res, next);
 });
 
-// ✅ Google Login Route → Only allows existing users
+//  Google Login Route → Only allows existing users
 router.get("/google/login", (req, res, next) => {
-    req.session.isSignup = false; // ❌ Do NOT create new user
+    req.session.isSignup = false; //  Do NOT create new user
     passport.authenticate("google", { scope: ["profile", "email"] })(req, res, next);
 });
 
-// ✅ Google Auth Callback (Handles Both Login & Signup)
+//  Google Auth Callback (Handles Both Login & Signup)
 router.get(
     "/google/callback",
     passport.authenticate("google", {

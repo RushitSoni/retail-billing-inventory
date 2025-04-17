@@ -1,6 +1,6 @@
 const User = require("../Model/User");
 
-// ✅ Get All Users (Admin Only)
+// Get All Users (Admin Only)
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.find({}, "-password"); // Exclude password field
@@ -11,7 +11,7 @@ exports.getAllUsers = async (req, res) => {
 };
 
 
-// ✅ Get user by ID
+// Get user by ID
 exports.getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.userId).select("-password");
@@ -22,7 +22,7 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-// ✅ Update only name by ID
+// Update only name by ID
 exports.updateUserName = async (req, res) => {
   try {
     const { name } = req.body;

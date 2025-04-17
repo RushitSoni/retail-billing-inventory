@@ -2,7 +2,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
 export const generateExcelReport = ({ data, headers, filename }) => {
-    console.log(data, headers, filename)
+    
   if (!data || !headers || !filename) {
    
     console.error("Missing data or headers or file-name for the report.");

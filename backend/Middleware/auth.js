@@ -15,8 +15,8 @@ const authenticateUser = (req, res, next) => {
         if (err) {
             return res.status(403).json({ message: "Invalid or Expired Token" });
         }
-        req.user = decoded; // ✅ Store user info in request object
-        next(); // ✅ Proceed to the next middleware/route
+        req.user = decoded; //  Store user info in request object
+        next(); //  Proceed to the next middleware/route
     });
 };
 

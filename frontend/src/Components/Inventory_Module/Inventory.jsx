@@ -318,7 +318,7 @@ export default function Inventory() {
                 <Select
                   value={selectedBranch?.name}
                   onChange={(e) => {
-                    console.log(e.target.value, selectedShop["branches"]);
+                    //console.log(e.target.value, selectedShop["branches"]);
                     setSelectedBranch(e.target.value);
                   }}
                   disabled={!selectedShop} // Disable if no shop selected

@@ -27,6 +27,7 @@
   .request-card {
     width: 100%;
     overflow: auto;
+    scrollbar-width: none;
   }
   
   .card-content {
@@ -37,6 +38,7 @@
     transition: transform 0.2s;
     color:black;
     overflow: auto;
+    scrollbar-width: none;
   }
 
 
@@ -149,6 +151,7 @@
     width: auto;
     max-height: 150px;
     overflow-y: auto;
+    scrollbar-width: none;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     margin-top: 0.5rem;

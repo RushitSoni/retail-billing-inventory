@@ -8,12 +8,7 @@ const cookieParser = require('cookie-parser')
 dotenv.config()
 
 const PORT = process.env.PORT
-// const loginRoutes = require("./Route/Login");
-// const registerRoutes = require("./Route/Register");
-// const logoutRoutes = require("./Route/Logout")
-// const verifyEmail = require("./Route/VerifyEmail")
-// const forgotPasswordRoutes = require("./Route/ForgotPassword")
-// const resetPasswordRoutes = require("./Route/ResetPassword")
+
 const authRoutes = require("./Route/auth")
 const invoiceEmailRoute = require("./Route/invoice")
 
@@ -22,7 +17,7 @@ const customerRoutes = require("./Route/Customer")
 const billRoutes = require("./Route/Bill")
 const shopRoutes = require("./Route/Shop");
 const inventoryRoutes = require("./Route/Inventory");
-const userRoutes = require("./Route/usres")
+const userRoutes = require("./Route/users")
 const inventoryRequestRoutes = require("./Route/InventoryRequest")
 const uploadRoutes = require("./Route/upload");
 const auditLogRoutes = require("./Route/AuditLog")
@@ -30,6 +25,8 @@ const auditLogRoutes = require("./Route/AuditLog")
 const session = require("express-session");
 const passport = require("passport");
 require("./Middleware/passportConfig"); 
+
+
 
 // Middlewares
 app.use(cors({origin: `${process.env.CLIENT_URL}`, credentials: true }));
@@ -44,12 +41,6 @@ app.use(passport.session());
 connectMongoDB()
 
 
-// app.use("/api/register", registerRoutes);
-// app.use("/api/login", loginRoutes);
-// app.use("/api/logout",authenticateUser, logoutRoutes);
-// app.use("/api/verify-email",verifyEmail)
-// app.use("/api/forgot-password",forgotPasswordRoutes)
-// app.use("/api/reset-password",resetPasswordRoutes)
 app.use("/api/auth",authRoutes)
 app.use("/send-invoice-email",invoiceEmailRoute)
 app.use("/api/customers",authenticateUser, customerRoutes);
@@ -58,9 +49,6 @@ app.use("/api/shops",authenticateUser, shopRoutes);
 app.use("/api/inventory",authenticateUser, inventoryRoutes);
 app.use("/api/users",authenticateUser, userRoutes);
 app.use("/api/inventory-requests",authenticateUser,inventoryRequestRoutes)
-// app.get("/aboutUs", authenticateUser, authorizeRoles("admin"), (req, res) => {
-//     res.send("Hello! Rushit Soni");
-// });
 app.use("/api/upload", uploadRoutes);
 app.use("/api/audit-logs",auditLogRoutes)
 

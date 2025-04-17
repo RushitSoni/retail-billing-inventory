@@ -1,6 +1,6 @@
 const AuditLog = require("../Model/AuditLog");
 
-// ✅ Fetch Audit Logs
+//  Fetch Audit Logs
 const getAuditLogs = async (req, res) => {
   try {
     const logs = await AuditLog.find().sort({ createdAt: -1 });
@@ -10,18 +10,18 @@ const getAuditLogs = async (req, res) => {
   }
 };
 
-// ✅ Add Audit Log (For testing)
+// Add Audit Log 
 const addAuditLog = async (req, res) => {
   try {
     const newLog = await AuditLog.create(req.body);
     res.status(201).json({ log: newLog });
   } catch (error) {
-    console.log(error.message)
+    //console.log(error.message)
     res.status(500).json({ message: "Failed to add audit log" });
   }
 };
 
-// ❌ Delete Audit Log
+//  Delete Audit Log
 const deleteAuditLog = async (req, res) => {
   try {
     const { id } = req.params;

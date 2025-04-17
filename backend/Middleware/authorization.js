@@ -5,12 +5,10 @@ const ACCESS_SECRET = process.env.JWT_SECRET;
 
 
 
-// ✅ Role-Based Authorization Middleware
+//  Role-Based Authorization Middleware
 const authorizeRoles = (...allowedRoles) => {
     return (req, res, next) => {
-        console.log("Allowed Roles:", allowedRoles);
-        console.log("User Role:", req.user.role);
-
+       
         if (!req.user || !allowedRoles.includes(req.user.role)) {
             return res.status(403).json({ message: "Access Denied: You do not have permission" });
         }
